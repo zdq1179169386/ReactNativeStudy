@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {Button, Platform, StyleSheet, Text, View} from 'react-native';
+import actions from "../action";
+import {connect} from "react-redux";
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -9,13 +11,16 @@ const instructions = Platform.select({
 });
 
 type Props = {};
-export default class FavoritePage extends Component<Props> {
+ class FavoritePage extends Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <Text style={styles.welcome}>WFavoritePage</Text>
+        <Button title={'改变主题色'} onPress={
+          () => {
+            this.props.onThemeChange('yellow');
+          }
+        }/>
       </View>
     );
   }
@@ -39,3 +44,12 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
+
+
+const mapStateToProps = state => ({});
+
+const mapDispatchToProps = dispatch => ({
+  onThemeChange: (themeColor) => dispatch(actions.onThemeChange(themeColor)),
+})
+
+export default connect(mapStateToProps,mapDispatchToProps)(FavoritePage);

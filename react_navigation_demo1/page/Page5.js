@@ -1,5 +1,5 @@
 import React,{Component} from  'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {Button, Platform, StyleSheet, Text, View} from 'react-native';
 
 
 
@@ -13,12 +13,14 @@ export default  class  Page5 extends Component<Props>{
 })
 
     render() {
+        const {navigation} = this.props;
         return(
             <View style={styles.container}>
-                <Text style={styles.welcome}>
-                    单 nav + tab + drawer
-                    pop 时候的页面上移问题虽然解决了，但是无法在home  的headerleft 加 对 drawer 和 title 的 操作
-                </Text>
+                <Button title={'go page1'} onPress={
+                    () => {
+                        navigation.navigate('Page1',{name: '动态的'})
+                    }
+                }/>
             </View>
         );
     };

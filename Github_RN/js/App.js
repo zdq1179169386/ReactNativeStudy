@@ -1,16 +1,15 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View} from 'react-native';
-import {
-  createStackNavigator,
-  createBottomTabNavigator,
-  createSwitchNavigator,
-    createAppContainer
-} from "react-navigation";
+import {Provider} from 'react-redux';
+import AppNavigator from './navigator/AppNavigators';
+import store from './store';
 
 export default class App extends Component<Props> {
   render() {
     return (
-        createAppContainer(<MainPage/>)
+        <Provider store={store}>
+          <AppNavigator/>
+        </Provider>
     )
   }
 }

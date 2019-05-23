@@ -8,7 +8,8 @@ export default class WelcomPage extends Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <Button title={'点击'} onPress={()=>{
+        <Text>WelcomPage</Text>
+        <Button title={'主页'} onPress={()=>{
           NavigationUtil.resetToHomePage({
             navigation: this.props.navigation,
           })
