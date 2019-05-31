@@ -1,8 +1,9 @@
 import Types from '../../action/types';
+import {ThemeFactory,ThmemeFlags}  from '../../res/ThemeFactory'
 
 
 const  defaultState = {
-    theme:'red'
+    theme: ThemeFactory.createTheme(ThmemeFlags.Default)
 };
 
 export default function onAction(state = defaultState,action) {
@@ -14,6 +15,5 @@ export default function onAction(state = defaultState,action) {
         default:{
             return state;
         }
-        
     }
 }

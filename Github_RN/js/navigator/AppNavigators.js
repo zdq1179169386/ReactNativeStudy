@@ -16,6 +16,8 @@ import {
 } from 'react-navigation-redux-helpers'
 import FetchDemoPage from '../pages/FetchDemoPage'
 import AsyncStoragePage from  '../pages/AsyncStoragePage'
+import WebViewPage from '../pages/WebViewPage'
+import CutomThemePage from '../pages/CutomThemePage'
 
 //跟路由
 export const rootCom = 'Welcom';
@@ -52,6 +54,18 @@ const MainStack = createStackNavigator({
         screen:AsyncStoragePage,
         navigationOptions:{
             title:'AsyncStorage 使用'
+        }
+    },
+    WebViewPage:{
+        screen:WebViewPage,
+        navigationOptions:{
+            header: null,
+        }
+    },
+    CutomThemePage:{
+        screen: CutomThemePage,
+        navigationOptions:{
+            header:null,
         }
     }
 })

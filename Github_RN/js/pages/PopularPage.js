@@ -11,14 +11,15 @@ import isIphoneX from "../util/ScreenUtil";
 import FavoriteDao from '../expand/dao/FavoriteDao'
 import {FLAG_STORAGE} from "../expand/dao/DataStore";
 import FavoriteUtil from "../util/FavoriteUtil";
+import EventBus from 'react-native-event-bus'
+import EventTypes from '../util/EventTypes'
 
 
 const URL = 'https://api.github.com/search/repositories?q='
 const QUERY_STR = '&sort=stars'
-const THEME_COLOR = '#678'
 const  favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
 
-export default class PopularPage extends Component<Props> {
+ class PopularPage extends Component<Props> {
     constructor(props) {
         super(props);
         this.tabs = ['Java', 'Android', 'iOS', 'React', 'React Native', 'PHP'];
@@ -29,9 +30,10 @@ export default class PopularPage extends Component<Props> {
 
     _createTabs() {
         const tabs = {}
+        const {theme} = this.props
         this.tabs.forEach((item, index) => {
             tabs[`tab${index}`] = {
-                screen: props => <TopBarItemPage {...props} tabLabel={item}/>,
+                screen: props => <TopBarItemPage {...props} tabLabel={item} theme={theme}/>,
                 navigationOptions: {
                     title: item,
                 }
@@ -52,11 +54,12 @@ export default class PopularPage extends Component<Props> {
     * */
 
     render() {
+        const {theme} = this.props;
         let statusBar = {
-            backgroundColor: THEME_COLOR,
+            backgroundColor: theme.themeColor,
             barStyle:'light-content',
         }
-        let  navigationBar = <NavigationBar title={'最热'} statusBar={statusBar} style={{backgroundColor:THEME_COLOR}}/>
+        let  navigationBar = <NavigationBar title={'最热'} statusBar={statusBar} style={theme.styles.navBar}/>
         const TopTabNaviagtor = createMaterialTopTabNavigator(
             this._createTabs(), {
                 tabBarOptions: {
@@ -64,8 +67,8 @@ export default class PopularPage extends Component<Props> {
                     upperCaseLabel: false,
                     scrollEnabled: true,
                     style: {
-                        backgroundColor: '#678',
-                        height:40
+                        backgroundColor: theme.themeColor,
+                        height:35
                     },
                     indicatorStyle: styles.indicatorStyle,
                     labelStyle: styles.labelStyle,
@@ -75,13 +78,21 @@ export default class PopularPage extends Component<Props> {
         const AppTopTab = createAppContainer(TopTabNaviagtor)
         return (
 
-            <View style={{flex: 1,  marginTop:  isIphoneX ? 30 : 0}}>
+            <View style={{flex: 1}}>
                 {navigationBar}
                 <AppTopTab/>
             </View>
         );
     }
 }
+
+
+
+const mapPopularStateToProps = state => ({
+    theme: state.theme.theme,
+})
+
+export default connect(mapPopularStateToProps)(PopularPage);
 
 const PageSize = 10;
 
@@ -90,10 +101,25 @@ class TopBarItem extends Component<Props> {
         super(props);
         const {tabLabel} = this.props;
         this.storeName = tabLabel;
+        this.isFavoriteChange = false;
     }
 
     componentDidMount() {
         this._loadData();
+        EventBus.getInstance().addListener(EventTypes.favorite_change_popular,this.favoriteListener = () => {
+            this.isFavoriteChange = true;
+        })
+        EventBus.getInstance().addListener(EventTypes.bottom_tab_select,this.bottomListener = data=> {
+
+            if (data.to===0 && this.isFavoriteChange){
+                this._loadData(false);
+                this.isFavoriteChange = false;
+            }
+        })
+    }
+    componentWillUnmount(): void {
+        EventBus.getInstance().removeListener(EventTypes.favorite_change_popular);
+        EventBus.getInstance().removeListener(EventTypes.bottom_tab_select);
     }
 
     _loadData(loadMore) {
@@ -119,7 +145,6 @@ class TopBarItem extends Component<Props> {
                 isLoading: false,
                 projectModels: [],
                 hideLoadingMore: true,
-
             }
         }
         return store;
@@ -131,12 +156,14 @@ class TopBarItem extends Component<Props> {
 
     _renderItem(data) {
         const item = data.item;
+        const {theme} = this.props;
         return (
-            <PopularItem projectModel={item} onSelect={(callback) => {
+            <PopularItem projectModel={item} theme={theme} onSelect={(callback) => {
                 NavigationUtil.goPage('DetailPage',{
                     projectModel: item,
                     flag: FLAG_STORAGE.flag_popular,
-                    callback:callback
+                    callback:callback,
+                    theme:theme,
                 });
             }} onFavorite={(item,isFavorite) => FavoriteUtil.onFavorite(favoriteDao,item,isFavorite,FLAG_STORAGE.flag_popular)}
             />)
@@ -154,6 +181,7 @@ class TopBarItem extends Component<Props> {
 
 
     render() {
+        const {theme} = this.props;
         let store = this._getStore();
 
         return (
@@ -166,10 +194,10 @@ class TopBarItem extends Component<Props> {
                         <RefreshControl
                             refreshing={store.isLoading}
                             title={'Loading'}
-                            tintColor={THEME_COLOR}
-                            colors={[THEME_COLOR]}
+                            tintColor={theme.themeColor}
+                            colors={[theme.themeColor]}
                             onRefresh={() => this._loadData(false)}
-                            titleColor={THEME_COLOR}
+                            titleColor={theme.themeColor}
                         />
                     }
                     ListFooterComponent={this._getListFooter()}
@@ -205,7 +233,7 @@ class TopBarItem extends Component<Props> {
 }
 
 const mapStateToProps = state => ({
-    popular: state.popular
+    popular: state.popular,
 })
 
 
@@ -242,7 +270,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white'
     },
     labelStyle: {
-        fontSize: 13,
+        fontSize: 15,
         margin: 0,
     },
     listFooterStyle: {

@@ -7,6 +7,7 @@ import NavigationUtil from "../navigator/NavigationUtil";
 import isIphoneX from '../util/ScreenUtil'
 import BackPressComponent from "../common/BackPressComponent";
 import FavoriteDao from "../expand/dao/FavoriteDao";
+import SafeAreaViewPlus  from '../common/SafeAreaViewPlus'
 
 const TRENDINF_URL = 'http://github.com/'
 const THEME_COLOR = '#678'
@@ -89,11 +90,11 @@ export default class DetailPage extends Component<Props> {
             NavigationUtil.goBack(this.props.navigation);
         }
     }
-
+w
     render() {
-
+        const {theme} = this.params;
         let statusBar = {
-            backgroundColor: THEME_COLOR,
+            backgroundColor: theme.themeColor,
             barStyle: 'light-content',
         }
         const titleLayOut = this.state.title.length > 20 ? {paddingRight : 30} : null;
@@ -101,19 +102,19 @@ export default class DetailPage extends Component<Props> {
                                            title={this.state.title}
                                            titleLayoutStyle={titleLayOut}
                                            statusBar={statusBar}
-                                           style={{backgroundColor: THEME_COLOR}}
+                                           style={theme.styles.navBar}
                                            rightBtn={this.getRightBackBtn()}
         />
 
         return (
-            <View style={{flex: 1, marginTop:  isIphoneX ? 30 : 0}}>
+            <SafeAreaViewPlus topColor={theme.themeColor}>
                 {navigationBar}
                 <WebView source={{uri: this.state.url}}
                          ref={webView => this.webView = webView}
                          startInLoadingState={true}
                          onNavigationStateChange={e=> this.onNavigationStateChange(e)}
                 />
-            </View>
+            </SafeAreaViewPlus>
         );
     }
 

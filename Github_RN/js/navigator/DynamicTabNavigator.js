@@ -11,6 +11,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import {BottomTabBar} from "react-navigation-tabs";
 import {connect} from 'react-redux';
+import EventBus from 'react-native-event-bus'
+import EventTypes from '../util/EventTypes'
 
 const TABS = {
     PopularPage: {
@@ -91,7 +93,7 @@ class TabBarComponent extends React.Component {
         return (
             <BottomTabBar
                 {...this.props}
-                activeTintColor={this.props.theme}
+                activeTintColor={this.props.theme.themeColor}
                 // onTabPress={(index)=>{
                 //     alert(index)
                 // }}
@@ -129,7 +131,15 @@ class TabBarComponent extends React.Component {
     render() {
         const MainTab = this._createTabNavigator();
         return (
-            <MainTab/>
+            <MainTab
+                onNavigationStateChange={(preState,nextState,action)=>{
+                    EventBus.getInstance().fireEvent(EventTypes.bottom_tab_select,{
+                        from : preState.index,
+                        to : nextState.index
+                    })
+
+                }}
+            />
         );
     }
 }

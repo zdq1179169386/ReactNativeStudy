@@ -1,27 +1,20 @@
 import React, {Component} from 'react';
-import {Button, Platform, StyleSheet, Text, View,TouchableOpacity} from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import NavigationUtil from "../navigator/NavigationUtil";
-import  NavigationBar from  '../common/NavigationBar'
+import NavigationBar from '../common/NavigationBar'
 import Feather from 'react-native-vector-icons/Feather'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import isIphoneX from '../util/ScreenUtil'
+import More_Menu from '../common/More_Menu'
+import ViewUtil from '../util/ViewUtil'
+import {connect} from 'react-redux'
+import actions from '../action/index'
+import {ThemeFactory} from "../res/ThemeFactory";
 
-
-const instructions = Platform.select({
-    ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-    android:
-        'Double tap R on your keyboard to reload,\n' +
-        'Shake or press menu button for dev menu',
-});
-
-
-const THEME_COLOR = '#678'
-
-
-export default class MyPage extends Component<Props> {
+  class MyPage extends Component<Props> {
     _getLeftBtn(callBack) {
-        return <View style={{padding:8,paddingLeft: 15}}>
-            <TouchableOpacity onPress={callBack} >
+        return <View style={{padding: 8, paddingLeft: 15}}>
+            <TouchableOpacity onPress={callBack}>
                 <Ionicons
                     name={'ios-arrow-back'}
                     size={26}
@@ -30,12 +23,12 @@ export default class MyPage extends Component<Props> {
             </TouchableOpacity>
         </View>
     }
+
     _getRightBtn() {
         return <View>
-            <TouchableOpacity onPress={()=>{
-
+            <TouchableOpacity onPress={() => {
             }}>
-                <View style={{padding:5,marginRight:8}}>
+                <View style={{padding: 5, marginRight: 8}}>
                     <Feather
                         name={'search'}
                         size={24}
@@ -45,46 +38,113 @@ export default class MyPage extends Component<Props> {
             </TouchableOpacity>
         </View>
     }
-    render() {
-        let statusBar = {
-            backgroundColor: THEME_COLOR,
-            barStyle:'light-content',
+
+    onClick(menu) {
+        const {theme} = this.props;
+        let routeName, params = {};
+        switch (menu) {
+            case More_Menu.Tutorial:
+                routeName='WebViewPage';
+                params.title='教程';
+                params.url='http://www.baidu.com';
+                params.theme = theme
+                break
+            case More_Menu.Custom_Theme:
+                routeName='CutomThemePage';
+                params.title='主题';
+                params.theme = theme
+                break
         }
-        let navigationBar = <NavigationBar title={'我的'} style={{backgroundColor: THEME_COLOR}} statusBar={statusBar} leftBtn={this._getLeftBtn()} rightBtn={this._getRightBtn()}/>
+        if (routeName){
+            NavigationUtil.goPage(routeName,params);
+        }
+    }
+
+    getItem(menu) {
+        const {theme} = this.props;
+        return ViewUtil.getMenuItem(()=>this.onClick(menu),menu,theme.themeColor)
+    }
+
+    render() {
+        const {theme} = this.props;
+
+        let statusBar = {
+            backgroundColor: theme.themeColor,
+            barStyle: 'light-content',
+        }
+        let navigationBar = <NavigationBar title={'我的'} style={theme.styles.navBar} statusBar={statusBar}
+                                            rightBtn={this._getRightBtn()}/>
         return (
             <View style={styles.container}>
                 {navigationBar}
-                <Button title={'Fetch 使用'} onPress={
-                    () => {
-                        NavigationUtil.goPage('FetchDemoPage', {...this.props})
-                    }
-                }
-                />
-                <Button title={'AsyncStorage 使用'} onPress={
-                    () => {
-                        NavigationUtil.goPage('AsyncStoragePage', {...this.props})
-                    }
-                }
-                />
+                <ScrollView>
+                    <View>
+                        <TouchableOpacity>
+                            <View style={styles.about}>
+                                <View style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between'
+                                }}>
+                                    <Ionicons name={More_Menu.About.icon} size={40}
+                                              style={{marginRight: 10, color: theme.themeColor}}/>
+                                    <Text>ZDQ</Text>
+                                </View>
+                                <Ionicons name={'ios-arrow-forward'} size={16}
+                                          style={{marginRight: 10, color: theme.themeColor}}/>
+                            </View>
+                        </TouchableOpacity>
+                        {ViewUtil.getLine()}
+                        {this.getItem(More_Menu.Tutorial)}
+                        {/*趋势管理*/}
+                        <Text style={styles.groupTitle}>趋势管理</Text>
+                        {this.getItem(More_Menu.Custom_Language)}
+                        {ViewUtil.getLine()}
+                        {this.getItem(More_Menu.Sort_Language)}
+
+                        <Text style={styles.groupTitle}>最热模块</Text>
+                        {this.getItem(More_Menu.Custom_Key)}
+                        {this.getItem(More_Menu.Sort_Key)}
+                        {ViewUtil.getLine()}
+                        {this.getItem(More_Menu.Remove_Key)}
+
+                        <Text style={styles.groupTitle}>设置</Text>
+                        {this.getItem(More_Menu.Custom_Theme)}
+                        {ViewUtil.getLine()}
+                        {this.getItem(More_Menu.About_Author)}
+                        {ViewUtil.getLine()}
+                        {this.getItem(More_Menu.Feedback)}
+                    </View>
+                </ScrollView>
             </View>
         );
     }
 }
 
+const mapStateToProps = state => ({
+    theme: state.theme.theme,
+})
+
+export default connect(mapStateToProps,)(MyPage);
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F5FCFF',
-        marginTop: isIphoneX ? 30 : 0,
     },
-    welcome: {
-        fontSize: 20,
-        textAlign: 'center',
-        margin: 10,
+    about: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: 'white',
+        padding: 10,
+        height: 90,
     },
-    instructions: {
-        textAlign: 'center',
-        color: '#333333',
-        marginBottom: 5,
-    },
+    groupTitle:{
+        marginLeft:10,
+        marginTop: 10,
+        marginBottom:5,
+        fontSize:12,
+        color:'gray'
+    }
 });

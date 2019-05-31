@@ -5,6 +5,7 @@ import {BackHandler} from "react-native";
 import {NavigationActions} from "react-navigation";
 import {connect} from "react-redux";
 import BackPressComponent  from '../common/BackPressComponent'
+import SafeAreaViewPlus from '../common/SafeAreaViewPlus'
 
 
 class HomePage extends Component<Props> {
@@ -34,14 +35,18 @@ class HomePage extends Component<Props> {
 
     render() {
         NavigationUtil.navigation = this.props.navigation;
+        const {theme} = this.props;
         return (
-            <DynamicTabNavigator {...this.props}/>
+            <SafeAreaViewPlus topColor={theme.themeColor}>
+                <DynamicTabNavigator {...this.props}/>
+            </SafeAreaViewPlus>
         );
     }
 }
 
 const mapStateToProps = state => ({
     nav: state.nav,
+    theme: state.theme.theme
 });
 
 export default connect(mapStateToProps)(HomePage);

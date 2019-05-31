@@ -3,6 +3,7 @@ import theme from './theme';
 import {rootCom,RootNavigator} from '../navigator/AppNavigators'
 import popular from './popular'
 import trending from  './trending'
+import favorite  from './favorite'
 
 const navState = RootNavigator.router.getStateForAction(RootNavigator.router.getActionForPathAndParams(rootCom));
 
@@ -16,7 +17,8 @@ const index = combineReducers({
     nav: navReducer,
     theme: theme,
     popular:popular,
-    trending
+    trending:trending,
+    favorite:favorite
 })
 
 export default index;

@@ -32,10 +32,11 @@ const  TRENDING_PAGE_REFRESH_NOTIFY = 'TRENDING_PAGE_REFRESH_NOTIFY'
 const  favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending);
 
 
-export default class TrendingPage extends Component<Props> {
+ class TrendingPage extends Component<Props> {
     constructor(props) {
         super(props);
         this.tabs = ['All', 'C', 'Objective-C', 'PHP', 'JavaScript', 'PHP'];
+        this.preTheme = null;
         this.state = {
             timeSpan: Timespans[0],
         }
@@ -46,9 +47,10 @@ export default class TrendingPage extends Component<Props> {
 
     _createTabs() {
         const tabs = {}
+        const {theme} = this.props;
         this.tabs.forEach((item, index) => {
             tabs[`tab${index}`] = {
-                screen: props => <TrendingTabItemPage {...props} timeSpan={this.state.timeSpan} tabLabel={item}/>,
+                screen: props => <TrendingTabItemPage {...props} timeSpan={this.state.timeSpan} tabLabel={item} theme={theme}/>,
                 navigationOptions: {
                     title: item,
                 }
@@ -113,7 +115,8 @@ export default class TrendingPage extends Component<Props> {
     }
 
     _getTopTabNaviagtor() {
-        if (!this.appTopTab) {
+        const {theme} = this.props;
+        if (!this.appTopTab || (this.preTheme && this.preTheme != theme)) {
             const TopTabNaviagtor = createMaterialTopTabNavigator(
                 this._createTabs(), {
                     tabBarOptions: {
@@ -121,8 +124,8 @@ export default class TrendingPage extends Component<Props> {
                         upperCaseLabel: false,
                         scrollEnabled: true,
                         style: {
-                            backgroundColor: '#678',
-                            height: 40
+                            backgroundColor: theme.themeColor,
+                            height: 35
                         },
                         indicatorStyle: styles.indicatorStyle,
                         labelStyle: styles.labelStyle,
@@ -131,20 +134,22 @@ export default class TrendingPage extends Component<Props> {
             );
             this.appTopTab = createAppContainer(TopTabNaviagtor)
         }
+        this.preTheme = theme;
         return this.appTopTab;
     }
 
     render() {
+        const {theme} = this.props
         let statusBar = {
-            backgroundColor: THEME_COLOR,
+            backgroundColor: theme.themeColor,
             barStyle: 'light-content',
         }
         let navigationBar = <NavigationBar titleView={this._renderTitleView()} statusBar={statusBar}
-                                           style={{backgroundColor: THEME_COLOR}}/>
+                                           style={ theme.styles.navBar}/>
 
         const AppTopTab = this._getTopTabNaviagtor();
         return (
-            <View style={{flex: 1, marginTop: isIphoneX ? 30 : 0}}>
+            <View style={{flex: 1}}>
                 {navigationBar}
                 <AppTopTab/>
                 {this.renderTrendingDialog()}
@@ -152,6 +157,13 @@ export default class TrendingPage extends Component<Props> {
         );
     }
 }
+
+
+const mapPopularStateToProps = state => ({
+    theme: state.theme.theme,
+})
+
+export default connect(mapPopularStateToProps)(TrendingPage);
 
 const PageSize = 10;
 
@@ -213,12 +225,14 @@ class TrendingTabItem extends Component<Props> {
 
     _renderItem(data) {
         const item = data.item;
+        const {theme} = this.props;
         return (
-            <TrendingItem projectModel={item} onSelect={(callback) => {
+            <TrendingItem projectModel={item} theme={theme} onSelect={(callback) => {
                 NavigationUtil.goPage('DetailPage',{
                     projectModel: item,
                     flag: FLAG_STORAGE.flag_trending,
-                    callback:callback
+                    callback:callback,
+                    theme:theme
                 });
             }} onFavorite={(item,isFavorite) => FavoriteUtil.onFavorite(favoriteDao,item,isFavorite,FLAG_STORAGE.flag_trending)}/>)
     }
@@ -236,6 +250,7 @@ class TrendingTabItem extends Component<Props> {
 
     render() {
         let store = this._getStore();
+        const {theme} = this.props;
 
         return (
             <View style={styles.container}>
@@ -247,10 +262,10 @@ class TrendingTabItem extends Component<Props> {
                         <RefreshControl
                             refreshing={store.isLoading}
                             title={'Loading'}
-                            tintColor={THEME_COLOR}
-                            colors={[THEME_COLOR]}
+                            tintColor={theme.themeColor}
+                            colors={[theme.themeColor]}
                             onRefresh={() => this._loadData(false)}
-                            titleColor={THEME_COLOR}
+                            titleColor={theme.themeColor}
                         />
                     }
                     ListFooterComponent={this._getListFooter()}
@@ -322,9 +337,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white'
     },
     labelStyle: {
-        fontSize: 13,
-        marginTop: 6,
-        marginBottom: 6,
+        fontSize: 15,
+        margin: 0,
     },
     listFooterStyle: {
         alignItems: 'center'

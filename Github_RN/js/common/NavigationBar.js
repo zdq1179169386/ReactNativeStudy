@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
 import {PropTypes} from 'prop-types'
-import {Platform, StyleSheet, Text, View, Button, TouchableOpacity, StatusBar, ViewPropTypes} from 'react-native';
+import {Platform, StyleSheet, Text, View, Button, DeviceInfo, StatusBar, ViewPropTypes} from 'react-native';
+import isIphoneX from '../util/ScreenUtil'
 
 const NAV_BAR_HEIGHT_IOS = 44;//导航栏ios高度
 const NAV_BAR_HEIGHT_ANDROID = 50;//导航栏android高度
-const STATUS_BAR_HEIGHT = 20;//状态栏高度
+const STATUS_BAR_HEIGHT = DeviceInfo.isIPhoneX_deprecated ? 0 : 20;//状态栏的高度
 
 
 // statusBar 的属性
@@ -82,7 +83,6 @@ const styles = StyleSheet.create({
 
     },
     navBarTitleContainer: {
-
         alignItems: 'center',
         justifyContent: 'center',
         position: 'absolute',

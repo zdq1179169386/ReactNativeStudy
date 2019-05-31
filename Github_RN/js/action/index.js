@@ -1,6 +1,7 @@
 import {onThemeChange} from './theme';
 import {onLoadPopularData,onLoadMorePopularData} from './popular'
 import  {onLoadTrendingData,onLoadMoreTrendingData} from './trending'
+import  {onLoadFavoriteData} from './favorite'
 
 //根action
 export default {
@@ -8,5 +9,6 @@ export default {
     onLoadPopularData,
     onLoadMorePopularData,
     onLoadTrendingData,
-    onLoadMoreTrendingData
+    onLoadMoreTrendingData,
+    onLoadFavoriteData
 }
