@@ -9,10 +9,9 @@ const navState = RootNavigator.router.getStateForAction(RootNavigator.router.get
 
 const  navReducer = (state = navState, action)=>{
     const nextState = RootNavigator.router.getStateForAction(action, state);
-
     return nextState || state;
 }
-
+// 合并reducer
 const index = combineReducers({
     nav: navReducer,
     theme: theme,

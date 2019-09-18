@@ -22,6 +22,7 @@ import CutomThemePage from '../pages/CutomThemePage'
 //跟路由
 export const rootCom = 'Welcom';
 
+//欢迎页的导航栈
 const WelcomStack = createStackNavigator({
     WelcomPage: {
         screen: WelcomPage,
@@ -30,7 +31,7 @@ const WelcomStack = createStackNavigator({
         }
     }
 })
-
+//主tabbar 的导航栈
 const MainStack = createStackNavigator({
     HomePage: {
         screen: HomePage,
@@ -90,12 +91,11 @@ export const middleware = createReactNavigationReduxMiddleware(
 
 //reduxifyNavigator is deprecated in react-navigation-redux-helpers@3.0.0! Please use createReduxContainer instead.
 
-
 // const AppWithNavigationState = reduxifyNavigator(RootNavigator,'root');
 
 const AppWithNavigationState = createReduxContainer(RootNavigator, 'root');
 
-
+// state 到 props 的映射
 const mapStateToProps = state => ({
     state: state.nav,
 })
