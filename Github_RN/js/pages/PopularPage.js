@@ -132,6 +132,7 @@ class TopBarItem extends Component<Props> {
             })
         } else {
             //下来刷新
+            console.log( this._getUrl(this.storeName))
             onLoadPopularData(this.storeName, this._getUrl(this.storeName), PageSize,favoriteDao);
         }
     }

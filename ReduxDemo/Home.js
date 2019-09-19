@@ -5,7 +5,6 @@ import {
     ScrollView,
     View,
     Text,
-    StatusBar,
     Button
 } from 'react-native';
 import {connect} from 'react-redux'

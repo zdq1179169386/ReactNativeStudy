@@ -35,7 +35,7 @@ const  favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending);
  class TrendingPage extends Component<Props> {
     constructor(props) {
         super(props);
-        this.tabs = ['All', 'C', 'Objective-C', 'PHP', 'JavaScript', 'PHP'];
+        this.tabs = ['C', 'Objective-C', 'Java','JavaScript','Python','PHP'];
         this.preTheme = null;
         this.state = {
             timeSpan: Timespans[0],
@@ -192,6 +192,7 @@ class TrendingTabItem extends Component<Props> {
             })
         } else {
             //下来刷新
+            console.log(this._getUrl(this.storeName))
             onLoadTrendingData(this.storeName, this._getUrl(this.storeName), PageSize,favoriteDao);
         }
     }
@@ -257,7 +258,7 @@ class TrendingTabItem extends Component<Props> {
                 <FlatList
                     renderItem={(data) => this._renderItem(data)}
                     data={store.projectModes}
-                    keyExtractor={item => '' + (item.id || item.fullName)}
+                    keyExtractor={item => '' + (item.item.id || item.item.fullName)}
                     refreshControl={
                         <RefreshControl
                             refreshing={store.isLoading}
