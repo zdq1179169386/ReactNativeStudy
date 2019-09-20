@@ -10,6 +10,7 @@ import ViewUtil from '../util/ViewUtil'
 import {connect} from 'react-redux'
 import actions from '../action/index'
 import {ThemeFactory} from "../res/ThemeFactory";
+import {Actions} from "react-native-router-flux";
 
   class MyPage extends Component<Props> {
     _getLeftBtn(callBack) {
@@ -56,7 +57,8 @@ import {ThemeFactory} from "../res/ThemeFactory";
                 break
         }
         if (routeName){
-            NavigationUtil.goPage(routeName,params);
+            // NavigationUtil.goPage(routeName,params);
+            Actions.push('CutomThemePage',params);
         }
     }
 

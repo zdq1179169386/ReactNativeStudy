@@ -28,14 +28,14 @@ import FavoriteUtil from "../util/FavoriteUtil";
 
 const URL = 'https://github.com/trending/'
 const THEME_COLOR = '#678'
-const  TRENDING_PAGE_REFRESH_NOTIFY = 'TRENDING_PAGE_REFRESH_NOTIFY'
-const  favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending);
+const TRENDING_PAGE_REFRESH_NOTIFY = 'TRENDING_PAGE_REFRESH_NOTIFY'
+const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending);
 
 
- class TrendingPage extends Component<Props> {
+class TrendingPage extends Component<Props> {
     constructor(props) {
         super(props);
-        this.tabs = ['C', 'Objective-C', 'Java','JavaScript','Python','PHP'];
+        this.tabs = ['C', 'Objective-C', 'Java', 'JavaScript', 'Python', 'PHP'];
         this.preTheme = null;
         this.state = {
             timeSpan: Timespans[0],
@@ -50,7 +50,8 @@ const  favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending);
         const {theme} = this.props;
         this.tabs.forEach((item, index) => {
             tabs[`tab${index}`] = {
-                screen: props => <TrendingTabItemPage {...props} timeSpan={this.state.timeSpan} tabLabel={item} theme={theme}/>,
+                screen: props => <TrendingTabItemPage {...props} timeSpan={this.state.timeSpan} tabLabel={item}
+                                                      theme={theme}/>,
                 navigationOptions: {
                     title: item,
                 }
@@ -103,7 +104,7 @@ const  favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending);
         this.setState({
             timeSpan: tab
         })
-        DeviceEventEmitter.emit(TRENDING_PAGE_REFRESH_NOTIFY,tab)
+        DeviceEventEmitter.emit(TRENDING_PAGE_REFRESH_NOTIFY, tab)
 
     }
 
@@ -145,7 +146,7 @@ const  favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending);
             barStyle: 'light-content',
         }
         let navigationBar = <NavigationBar titleView={this._renderTitleView()} statusBar={statusBar}
-                                           style={ theme.styles.navBar}/>
+                                           style={theme.styles.navBar}/>
 
         const AppTopTab = this._getTopTabNaviagtor();
         return (
@@ -177,7 +178,7 @@ class TrendingTabItem extends Component<Props> {
 
 
     componentWillUnmount(): void {
-        if (this.listener){
+        if (this.listener) {
             this.listener.remove();
         }
     }
@@ -187,20 +188,20 @@ class TrendingTabItem extends Component<Props> {
         let store = this._getStore();
         if (loadMore) {
             //   加载更多
-            onLoadMoreTrendingData(this.storeName, ++store.pageIndex, PageSize, store.items, favoriteDao,callBack => {
+            onLoadMoreTrendingData(this.storeName, ++store.pageIndex, PageSize, store.items, favoriteDao, callBack => {
                 this.refs.toast.show('没有更多数据了')
             })
         } else {
             //下来刷新
             console.log(this._getUrl(this.storeName))
-            onLoadTrendingData(this.storeName, this._getUrl(this.storeName), PageSize,favoriteDao);
+            onLoadTrendingData(this.storeName, this._getUrl(this.storeName), PageSize, favoriteDao);
         }
     }
 
 
     componentDidMount() {
         this._loadData(false);
-        this.listener = DeviceEventEmitter.addListener(TRENDING_PAGE_REFRESH_NOTIFY, (timeSpan)=>{
+        this.listener = DeviceEventEmitter.addListener(TRENDING_PAGE_REFRESH_NOTIFY, (timeSpan) => {
             this.timeSpan = timeSpan;
             this._loadData(false);
         })
@@ -224,18 +225,32 @@ class TrendingTabItem extends Component<Props> {
         return URL + key + '?' + this.timeSpan.searchText;
     }
 
+    //使用react-navigation 的写法
+    // _renderItem(data) {
+    //     const item = data.item;
+    //     const {theme} = this.props;
+    //     return (
+    //         <TrendingItem projectModel={item} theme={theme} onSelect={(callback) => {
+    //             NavigationUtil.goPage('DetailPage',{
+    //                 projectModel: item,
+    //                 flag: FLAG_STORAGE.flag_trending,
+    //                 callback:callback,
+    //                 theme:theme
+    //             });
+    //         }} onFavorite={(item,isFavorite) => FavoriteUtil.onFavorite(favoriteDao,item,isFavorite,FLAG_STORAGE.flag_trending)}/>)
+    // }
+
+
     _renderItem(data) {
         const item = data.item;
         const {theme} = this.props;
         return (
-            <TrendingItem projectModel={item} theme={theme} onSelect={(callback) => {
-                NavigationUtil.goPage('DetailPage',{
-                    projectModel: item,
-                    flag: FLAG_STORAGE.flag_trending,
-                    callback:callback,
-                    theme:theme
-                });
-            }} onFavorite={(item,isFavorite) => FavoriteUtil.onFavorite(favoriteDao,item,isFavorite,FLAG_STORAGE.flag_trending)}/>)
+            <TrendingItem projectModel={item} theme={theme} onSelect={(callback) => Actions.push('DetailPage', {
+                projectModel: item,
+                flag: FLAG_STORAGE.flag_trending,
+                callback: callback,
+                theme: theme
+            })} onFavorite={(item, isFavorite) => FavoriteUtil.onFavorite(favoriteDao, item, isFavorite, FLAG_STORAGE.flag_trending)}/>)
     }
 
     _getListFooter() {
@@ -307,8 +322,8 @@ const mapStateToProps = state => ({
 
 
 const mapDispatchToProps = dispatch => ({
-    onLoadTrendingData: (storeName, url, pageSize,favoriteDao) => dispatch(actions.onLoadTrendingData(storeName, url, pageSize,favoriteDao)),
-    onLoadMoreTrendingData: (storeName, pageIndex, pageSize, items, favoriteDao,callBack) => dispatch(actions.onLoadMoreTrendingData(storeName, pageIndex, pageSize, items,favoriteDao, callBack)),
+    onLoadTrendingData: (storeName, url, pageSize, favoriteDao) => dispatch(actions.onLoadTrendingData(storeName, url, pageSize, favoriteDao)),
+    onLoadMoreTrendingData: (storeName, pageIndex, pageSize, items, favoriteDao, callBack) => dispatch(actions.onLoadMoreTrendingData(storeName, pageIndex, pageSize, items, favoriteDao, callBack)),
 
 })
 const TrendingTabItemPage = connect(mapStateToProps, mapDispatchToProps)(TrendingTabItem);

@@ -14,13 +14,12 @@ import FavoriteUtil from "../util/FavoriteUtil";
 import TrendingItem from '../common/TrendingItem'
 import EventBus from 'react-native-event-bus'
 import EventTypes from '../util/EventTypes'
-
-
+import {Actions} from "react-native-router-flux";
 
 
 const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
 
- class FavoritePage extends Component<Props> {
+class FavoritePage extends Component<Props> {
     constructor(props) {
         super(props);
         this.tabs = ['最热', '趋势',];
@@ -41,7 +40,7 @@ const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
                         title: '最热'
                     },
                 },
-                'Trending':{
+                'Trending': {
                     screen: props => <FavoriteBarItemPage {...props} flag={FLAG_STORAGE.flag_trending} theme={theme}/>,
                     navigationOptions: {
                         title: '趋势'
@@ -71,6 +70,7 @@ const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
         );
     }
 }
+
 const mapPopularStateToProps = state => ({
     theme: state.theme.theme,
 })
@@ -89,8 +89,8 @@ class FavoriteBarItem extends Component<Props> {
 
     componentDidMount() {
         this._loadData();
-        EventBus.getInstance().addListener(EventTypes.bottom_tab_select,this.listener = data => {
-            if (data.to == 2){
+        EventBus.getInstance().addListener(EventTypes.bottom_tab_select, this.listener = data => {
+            if (data.to == 2) {
                 this._loadData(false);
             }
         })
@@ -102,7 +102,7 @@ class FavoriteBarItem extends Component<Props> {
 
     _loadData(isShowLoading) {
         const {onLoadFavoriteData} = this.props;
-        onLoadFavoriteData(this.storeName,isShowLoading)
+        onLoadFavoriteData(this.storeName, isShowLoading)
     }
 
     _getStore() {
@@ -117,28 +117,42 @@ class FavoriteBarItem extends Component<Props> {
         return store;
     }
 
-    _onFavorite(item,isFavorite){
-        FavoriteUtil.onFavorite(this.favoriteDao,item,isFavorite,this.props.flag);
-        if (this.storeName === FLAG_STORAGE.flag_popular){
+    _onFavorite(item, isFavorite) {
+        FavoriteUtil.onFavorite(this.favoriteDao, item, isFavorite, this.props.flag);
+        if (this.storeName === FLAG_STORAGE.flag_popular) {
             EventBus.getInstance().fireEvent(EventTypes.favorite_change_popular);
         } else {
             EventBus.getInstance().fireEvent(EventTypes.favorite_change_trending);
         }
     }
 
+    // _renderItem(data) {
+    //     const item = data.item;
+    //     const {theme} = this.props;
+    //     const Item = this.storeName === FLAG_STORAGE.flag_popular ? PopularItem : TrendingItem;
+    //     return (
+    //         <Item projectModel={item} theme={theme} onSelect={(callback) => {
+    //             NavigationUtil.goPage('DetailPage', {
+    //                 projectModel: item,
+    //                 flag: this.storeName,
+    //                 callback: callback,
+    //                 theme:theme
+    //             });
+    //         }} onFavorite={(item, isFavorite) => this._onFavorite(item,isFavorite)}
+    //         />)
+    // }
+
     _renderItem(data) {
         const item = data.item;
         const {theme} = this.props;
         const Item = this.storeName === FLAG_STORAGE.flag_popular ? PopularItem : TrendingItem;
         return (
-            <Item projectModel={item} theme={theme} onSelect={(callback) => {
-                NavigationUtil.goPage('DetailPage', {
-                    projectModel: item,
-                    flag: this.storeName,
-                    callback: callback,
-                    theme:theme
-                });
-            }} onFavorite={(item, isFavorite) => this._onFavorite(item,isFavorite)}
+            <Item projectModel={item} theme={theme} onSelect={(callback) => Actions.push('DetailPage', {
+                projectModel: item,
+                flag: this.storeName,
+                callback: callback,
+                theme: theme
+            })} onFavorite={(item, isFavorite) => this._onFavorite(item, isFavorite)}
             />)
     }
 

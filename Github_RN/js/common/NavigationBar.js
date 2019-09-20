@@ -5,8 +5,7 @@ import isIphoneX from '../util/ScreenUtil'
 
 const NAV_BAR_HEIGHT_IOS = 44;//导航栏ios高度
 const NAV_BAR_HEIGHT_ANDROID = 50;//导航栏android高度
-const STATUS_BAR_HEIGHT = DeviceInfo.isIPhoneX_deprecated ? 0 : 20;//状态栏的高度
-
+const STATUS_BAR_HEIGHT = DeviceInfo.isIPhoneX_deprecated ?44 : 20;//状态栏的高度
 
 // statusBar 的属性
 const StatusBarShape = {

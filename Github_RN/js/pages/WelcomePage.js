@@ -11,10 +11,17 @@ import {
 import {TouchableOpacity} from "react-native-gesture-handler";
 import NavigationUtil from '../navigator/NavigationUtil';
 import Swiper from 'react-native-swiper';
-import {isIphoneX} from '../util/ScreenUtil'
+import {isIphoneX} from '../util/ScreenUtil';
+import {Actions} from 'react-native-router-flux';
 
 type Props = {};
-export default class WelcomPage extends Component<Props> {
+export default class WelcomePage extends Component<Props> {
+
+    componentDidMount(): void {
+        //判断是否是第一次加载，显示欢迎页
+        //再判断是否登录，没有跳转登录页，已经登录跳转主页
+    }
+
     render() {
         return (
             <Swiper style={styles.wrapper} showsButtons={false} loop={false} showsPagination={false}>
@@ -29,9 +36,7 @@ export default class WelcomPage extends Component<Props> {
                 <View style={styles.slide3}>
                     <Image source={isIphoneX() ? require('../../resource/images/intro_x/xz_img_intro_x03.png') : require('../../resource/images/intro/xz_img_intro_03.png')}/>
                     <View style={styles.btnContainer}>
-                        <TouchableOpacity style={styles.button} onPress={()=> {
-                            NavigationUtil.resetToHomePage({navigation: this.props.navigation})
-                        }}>
+                        <TouchableOpacity style={styles.button} onPress={()=> Actions.reset('login')}>
                             <Text style={styles.countText}>立即体验</Text>
                         </TouchableOpacity>
                     </View>

@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import { ScrollView, StyleSheet, Text, View,TouchableHighlight} from 'react-native';
+import {ScrollView, StyleSheet, Text, View, TouchableHighlight} from 'react-native';
 import NavigationBar from '../common/NavigationBar'
 import isIphoneX from '../util/ScreenUtil'
 import ThemeDao from "../expand/dao/ThemeDao";
-import {ThmemeFlags,ThemeFactory} from "../res/ThemeFactory";
+import {ThmemeFlags, ThemeFactory} from "../res/ThemeFactory";
 import ViewUtil from "../util/ViewUtil";
 import NavigationUtil from "../navigator/NavigationUtil";
 import {connect} from 'react-redux'
@@ -14,23 +14,32 @@ import GlobalStyles from "../res/GlobalStyles";
 
 class CutomThemePage extends Component<Props> {
 
-    constructor(props){
+    constructor(props) {
         super(props)
         this.params = this.props.navigation.state.params;
 
         this.themeDao = new ThemeDao();
     }
 
-    onSelectThemeColor(themekey){
+    onSelectThemeColor(themekey) {
         const {onThemeChange} = this.props;
         this.themeDao.save(ThmemeFlags[themekey]);
         onThemeChange(ThemeFactory.createTheme(ThmemeFlags[themekey]));
         NavigationUtil.goBack(this.props.navigation)
     }
 
-    getThemeItems(themekey){
-        return (<TouchableHighlight style={{flex: 1,underlayColor:'white'}} onPress={() => this.onSelectThemeColor(themekey)}>
-            <View style={{backgroundColor: ThmemeFlags[themekey] , justifyContent: 'center',alignItems: 'center', flex:1,padding: 3,margin:3, height: 100}}>
+    getThemeItems(themekey) {
+        return (<TouchableHighlight style={{flex: 1, underlayColor: 'white'}}
+                                    onPress={() => this.onSelectThemeColor(themekey)}>
+            <View style={{
+                backgroundColor: ThmemeFlags[themekey],
+                justifyContent: 'center',
+                alignItems: 'center',
+                flex: 1,
+                padding: 3,
+                margin: 3,
+                height: 100
+            }}>
                 <Text style={styles.themeText}>
                     {themekey}
                 </Text>
@@ -40,11 +49,11 @@ class CutomThemePage extends Component<Props> {
 
     renderThemeItems() {
         const views = [];
-        for (let i = 0,keys = Object.keys(ThmemeFlags),len = keys.length; i < len; i += 3){
+        for (let i = 0, keys = Object.keys(ThmemeFlags), len = keys.length; i < len; i += 3) {
             views.push(<View key={i} style={{flexDirection: 'row'}}>
                 {this.getThemeItems(keys[i])}
-                {this.getThemeItems(keys[i+1])}
-                {this.getThemeItems(keys[i+2])}
+                {this.getThemeItems(keys[i + 1])}
+                {this.getThemeItems(keys[i + 2])}
             </View>)
         }
         return views;
@@ -58,16 +67,16 @@ class CutomThemePage extends Component<Props> {
             barStyle: 'light-content',
         }
         let navigationBar = <NavigationBar title={'主题'} style={theme.styles.navBar} statusBar={statusBar}
-                                           leftBtn={ViewUtil.getLeftBackBtn(()=>{
+                                           leftBtn={ViewUtil.getLeftBackBtn(() => {
                                                NavigationUtil.goBack(this.props.navigation);
                                            })}/>
         return (
-            <SafeAreaViewPlus topColor={theme.themeColor}>
+            <View>
                 {navigationBar}
                 <ScrollView>
                     {this.renderThemeItems()}
                 </ScrollView>
-            </SafeAreaViewPlus>
+            </View>
         )
     }
 }
@@ -80,7 +89,7 @@ const mapDispatchToProps = dispatch => ({
     onThemeChange: (theme) => dispatch(actions.onThemeChange(theme))
 })
 
-export default connect(mapStateToProps,mapDispatchToProps)(CutomThemePage);
+export default connect(mapStateToProps, mapDispatchToProps)(CutomThemePage);
 
 const styles = StyleSheet.create({
     container: {
@@ -103,9 +112,9 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: 'gray'
     },
-    themeText:{
-        color:'white',
-        fontWeight:'500',
+    themeText: {
+        color: 'white',
+        fontWeight: '500',
         fontSize: 16
     }
 });

@@ -6,7 +6,7 @@ import {
 } from "react-navigation";
 
 import HomePage from '../pages/HomePage'
-import WelcomPage from '../pages/WelcomPage'
+import WelcomePage from '../pages/WelcomePage'
 import DetailPage from '../pages/DetailPage'
 import {connect} from "react-redux";
 import {
@@ -25,7 +25,7 @@ export const rootCom = 'Welcom';
 //欢迎页的导航栈
 const WelcomStack = createStackNavigator({
     WelcomPage: {
-        screen: WelcomPage,
+        screen: WelcomePage,
         navigationOptions: {
             header: null,
         }

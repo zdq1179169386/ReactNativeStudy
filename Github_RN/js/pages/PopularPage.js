@@ -6,20 +6,21 @@ import {connect} from 'react-redux'
 import actions from '../action/index'
 import PopularItem from '../common/PopularItem'
 import Toast, {DURATION} from 'react-native-easy-toast'
-import  NavigationBar from  '../common/NavigationBar'
+import NavigationBar from '../common/NavigationBar'
 import isIphoneX from "../util/ScreenUtil";
 import FavoriteDao from '../expand/dao/FavoriteDao'
 import {FLAG_STORAGE} from "../expand/dao/DataStore";
 import FavoriteUtil from "../util/FavoriteUtil";
 import EventBus from 'react-native-event-bus'
 import EventTypes from '../util/EventTypes'
+import {Actions} from "react-native-router-flux";
 
 
 const URL = 'https://api.github.com/search/repositories?q='
 const QUERY_STR = '&sort=stars'
-const  favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
+const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
 
- class PopularPage extends Component<Props> {
+class PopularPage extends Component<Props> {
     constructor(props) {
         super(props);
         this.tabs = ['Java', 'Android', 'iOS', 'React', 'React Native', 'PHP'];
@@ -57,9 +58,9 @@ const  favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
         const {theme} = this.props;
         let statusBar = {
             backgroundColor: theme.themeColor,
-            barStyle:'light-content',
+            barStyle: 'light-content',
         }
-        let  navigationBar = <NavigationBar title={'最热'} statusBar={statusBar} style={theme.styles.navBar}/>
+        let navigationBar = <NavigationBar title={'最热'} statusBar={statusBar} style={theme.styles.navBar}/>
         const TopTabNaviagtor = createMaterialTopTabNavigator(
             this._createTabs(), {
                 tabBarOptions: {
@@ -68,7 +69,7 @@ const  favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
                     scrollEnabled: true,
                     style: {
                         backgroundColor: theme.themeColor,
-                        height:35
+                        height: 35
                     },
                     indicatorStyle: styles.indicatorStyle,
                     labelStyle: styles.labelStyle,
@@ -85,7 +86,6 @@ const  favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
         );
     }
 }
-
 
 
 const mapPopularStateToProps = state => ({
@@ -106,17 +106,18 @@ class TopBarItem extends Component<Props> {
 
     componentDidMount() {
         this._loadData();
-        EventBus.getInstance().addListener(EventTypes.favorite_change_popular,this.favoriteListener = () => {
+        EventBus.getInstance().addListener(EventTypes.favorite_change_popular, this.favoriteListener = () => {
             this.isFavoriteChange = true;
         })
-        EventBus.getInstance().addListener(EventTypes.bottom_tab_select,this.bottomListener = data=> {
+        EventBus.getInstance().addListener(EventTypes.bottom_tab_select, this.bottomListener = data => {
 
-            if (data.to===0 && this.isFavoriteChange){
+            if (data.to === 0 && this.isFavoriteChange) {
                 this._loadData(false);
                 this.isFavoriteChange = false;
             }
         })
     }
+
     componentWillUnmount(): void {
         EventBus.getInstance().removeListener(EventTypes.favorite_change_popular);
         EventBus.getInstance().removeListener(EventTypes.bottom_tab_select);
@@ -127,13 +128,13 @@ class TopBarItem extends Component<Props> {
         let store = this._getStore();
         if (loadMore) {
             //   加载更多
-            onLoadMorePopularData(this.storeName, ++store.pageIndex, PageSize, store.items, favoriteDao,callBack => {
+            onLoadMorePopularData(this.storeName, ++store.pageIndex, PageSize, store.items, favoriteDao, callBack => {
                 this.refs.toast.show('没有更多数据了')
             })
         } else {
             //下来刷新
-            console.log( this._getUrl(this.storeName))
-            onLoadPopularData(this.storeName, this._getUrl(this.storeName), PageSize,favoriteDao);
+            console.log(this._getUrl(this.storeName))
+            onLoadPopularData(this.storeName, this._getUrl(this.storeName), PageSize, favoriteDao);
         }
     }
 
@@ -155,31 +156,46 @@ class TopBarItem extends Component<Props> {
         return URL + key + QUERY_STR;
     }
 
+    // _renderItem(data) {
+    //     const item = data.item;
+    //     const {theme} = this.props;
+    //     return (
+    //         <PopularItem projectModel={item} theme={theme} onSelect={(callback) => {
+    //             NavigationUtil.goPage('DetailPage',{
+    //                 projectModel: item,
+    //                 flag: FLAG_STORAGE.flag_popular,
+    //                 callback:callback,
+    //                 theme:theme,
+    //             });
+    //         }} onFavorite={(item,isFavorite) => FavoriteUtil.onFavorite(favoriteDao,item,isFavorite,FLAG_STORAGE.flag_popular)}
+    //         />)
+    // }
+
     _renderItem(data) {
         const item = data.item;
         const {theme} = this.props;
         return (
             <PopularItem projectModel={item} theme={theme} onSelect={(callback) => {
-                NavigationUtil.goPage('DetailPage',{
+                Actions.push('DetailPage', {
                     projectModel: item,
                     flag: FLAG_STORAGE.flag_popular,
-                    callback:callback,
-                    theme:theme,
-                });
-            }} onFavorite={(item,isFavorite) => FavoriteUtil.onFavorite(favoriteDao,item,isFavorite,FLAG_STORAGE.flag_popular)}
+                    callback: callback,
+                    theme: theme,
+                })
+            }} onFavorite={(item, isFavorite) => FavoriteUtil.onFavorite(favoriteDao, item, isFavorite, FLAG_STORAGE.flag_popular)}
             />)
     }
 
     _getListFooter() {
         return this._getStore().hideLoadingMore ? null :
             <View style={styles.listFooterStyle}>
+                {/*iOS 下这个颜色好像改不了*/}
                 <ActivityIndicator
                     style={styles.activityIndicator}
                 />
-                <Text>正在加载更多</Text>
+                <Text style={{color: this.props.theme.themeColor}}>正在加载更多</Text>
             </View>
     }
-
 
     render() {
         const {theme} = this.props;
@@ -239,8 +255,8 @@ const mapStateToProps = state => ({
 
 
 const mapDispatchToProps = dispatch => ({
-    onLoadPopularData: (storeName, url, pageSize, favoriteDao) => dispatch(actions.onLoadPopularData(storeName, url, pageSize,favoriteDao)),
-    onLoadMorePopularData: (storeName, pageIndex, pageSize, items, favoriteDao,callBack) => dispatch(actions.onLoadMorePopularData(storeName, pageIndex, pageSize, items, favoriteDao,callBack)),
+    onLoadPopularData: (storeName, url, pageSize, favoriteDao) => dispatch(actions.onLoadPopularData(storeName, url, pageSize, favoriteDao)),
+    onLoadMorePopularData: (storeName, pageIndex, pageSize, items, favoriteDao, callBack) => dispatch(actions.onLoadMorePopularData(storeName, pageIndex, pageSize, items, favoriteDao, callBack)),
 
 })
 const TopBarItemPage = connect(mapStateToProps, mapDispatchToProps)(TopBarItem);
@@ -264,7 +280,7 @@ const styles = StyleSheet.create({
     },
     tabStyle: {
         // minWidth: 50,
-        padding:0,
+        padding: 0,
     },
     indicatorStyle: {
         height: 2,
@@ -277,7 +293,5 @@ const styles = StyleSheet.create({
     listFooterStyle: {
         alignItems: 'center'
     },
-    activityIndicator: {
-
-    }
+    activityIndicator: {}
 });

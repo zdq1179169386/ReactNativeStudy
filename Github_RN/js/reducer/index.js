@@ -13,7 +13,6 @@ const  navReducer = (state = navState, action)=>{
 }
 // 合并reducer
 const index = combineReducers({
-    nav: navReducer,
     theme: theme,
     popular:popular,
     trending:trending,
