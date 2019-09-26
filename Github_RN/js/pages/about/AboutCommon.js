@@ -1,6 +1,6 @@
 import {BackHandler} from "react-native";
 import BackPressComponent from "../../common/BackPressComponent";
-import NavigationUtil from "../../navigator/NavigationUtil";
+import {Actions} from "react-native-router-flux";
 
 export  default  class AboutCommon {
     constructor(props){
@@ -9,7 +9,7 @@ export  default  class AboutCommon {
     }
 
     onBackPress(){
-        NavigationUtil.goBack(this.props.navigation);
+        Actions.pop();
         return true;
     }
 

@@ -1,13 +1,11 @@
 import React, {Component} from 'react';
 import {StyleSheet, View, FlatList, RefreshControl} from 'react-native';
 import {createMaterialTopTabNavigator, createAppContainer} from 'react-navigation'
-import NavigationUtil from '../navigator/NavigationUtil'
 import {connect} from 'react-redux'
 import actions from '../action/index'
 import PopularItem from '../common/PopularItem'
 import Toast, {DURATION} from 'react-native-easy-toast'
 import NavigationBar from '../common/NavigationBar'
-import isIphoneX from "../util/ScreenUtil";
 import FavoriteDao from '../expand/dao/FavoriteDao'
 import {FLAG_STORAGE} from "../expand/dao/DataStore";
 import FavoriteUtil from "../util/FavoriteUtil";
@@ -15,6 +13,7 @@ import TrendingItem from '../common/TrendingItem'
 import EventBus from 'react-native-event-bus'
 import EventTypes from '../util/EventTypes'
 import {Actions} from "react-native-router-flux";
+import Ii8n from "../util/i18n";
 
 
 const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
@@ -22,7 +21,48 @@ const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
 class FavoritePage extends Component<Props> {
     constructor(props) {
         super(props);
-        this.tabs = ['最热', '趋势',];
+        this.tabs = ['最热', '趋势'];
+        this.preTheme = null;
+
+    }
+
+    _getTopTabNaviagtor() {
+        const {theme} = this.props;
+        if (!this.appTopTab || (this.preTheme && this.preTheme != theme)) {
+            const TopTabNaviagtor = createMaterialTopTabNavigator(
+                {
+                    'Popular': {
+                        screen: props => <FavoriteBarItemPage {...props} flag={FLAG_STORAGE.flag_popular}
+                                                              theme={theme}/>,
+                        navigationOptions: {
+                            title: Ii8n('tabHot')
+                        },
+                    },
+                    'Trending': {
+                        screen: props => <FavoriteBarItemPage {...props} flag={FLAG_STORAGE.flag_trending}
+                                                              theme={theme}/>,
+                        navigationOptions: {
+                            title: Ii8n('tabTrending')
+                        },
+                    }
+                }
+                , {
+                    tabBarOptions: {
+                        tabStyle: styles.tabStyle,
+                        upperCaseLabel: false,
+                        style: {
+                            backgroundColor: theme.themeColor,
+                            height: 35
+                        },
+                        indicatorStyle: styles.indicatorStyle,
+                        labelStyle: styles.labelStyle,
+                    }
+                }
+            );
+            this.appTopTab = createAppContainer(TopTabNaviagtor)
+        }
+        this.preTheme = theme
+        return this.appTopTab
     }
 
     render() {
@@ -31,38 +71,9 @@ class FavoritePage extends Component<Props> {
             backgroundColor: theme.themeColor,
             barStyle: 'light-content',
         }
-        let navigationBar = <NavigationBar title={'收藏'} statusBar={statusBar} style={theme.styles.navBar}/>
-        const TopTabNaviagtor = createMaterialTopTabNavigator(
-            {
-                'Popular': {
-                    screen: props => <FavoriteBarItemPage {...props} flag={FLAG_STORAGE.flag_popular} theme={theme}/>,
-                    navigationOptions: {
-                        title: '最热'
-                    },
-                },
-                'Trending': {
-                    screen: props => <FavoriteBarItemPage {...props} flag={FLAG_STORAGE.flag_trending} theme={theme}/>,
-                    navigationOptions: {
-                        title: '趋势'
-                    },
-                }
-            }
-            , {
-                tabBarOptions: {
-                    tabStyle: styles.tabStyle,
-                    upperCaseLabel: false,
-                    style: {
-                        backgroundColor: theme.themeColor,
-                        height: 35
-                    },
-                    indicatorStyle: styles.indicatorStyle,
-                    labelStyle: styles.labelStyle,
-                }
-            }
-        );
-        const AppTopTab = createAppContainer(TopTabNaviagtor)
+        let navigationBar = <NavigationBar title={Ii8n('tabFavorite')} statusBar={statusBar} style={theme.styles.navBar}/>
+        const AppTopTab = this._getTopTabNaviagtor()
         return (
-
             <View style={{flex: 1,}}>
                 {navigationBar}
                 <AppTopTab/>
@@ -125,22 +136,6 @@ class FavoriteBarItem extends Component<Props> {
             EventBus.getInstance().fireEvent(EventTypes.favorite_change_trending);
         }
     }
-
-    // _renderItem(data) {
-    //     const item = data.item;
-    //     const {theme} = this.props;
-    //     const Item = this.storeName === FLAG_STORAGE.flag_popular ? PopularItem : TrendingItem;
-    //     return (
-    //         <Item projectModel={item} theme={theme} onSelect={(callback) => {
-    //             NavigationUtil.goPage('DetailPage', {
-    //                 projectModel: item,
-    //                 flag: this.storeName,
-    //                 callback: callback,
-    //                 theme:theme
-    //             });
-    //         }} onFavorite={(item, isFavorite) => this._onFavorite(item,isFavorite)}
-    //         />)
-    // }
 
     _renderItem(data) {
         const item = data.item;

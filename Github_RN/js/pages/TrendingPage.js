@@ -15,19 +15,19 @@ import actions from '../action/index'
 import Toast, {DURATION} from 'react-native-easy-toast'
 import NavigationBar from '../common/NavigationBar'
 import TrendingItem from '../common/TrendingItem'
-import DeviceInfo from 'react-native'
 import TrendingDialog, {Timespans} from '../common/TrendingDialog'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import Timespan from "../model/Timespan";
-import isIphoneX from '../util/ScreenUtil'
-import NavigationUtil from "../navigator/NavigationUtil";
-import FavoriteDao from "../expand/dao/FavoriteDao";
 import {FLAG_STORAGE} from "../expand/dao/DataStore";
 import FavoriteUtil from "../util/FavoriteUtil";
+import FavoriteDao from '../expand/dao/FavoriteDao';
+import {Actions} from 'react-native-router-flux';
+import EventBus from "react-native-event-bus";
+import EventTypes from "../util/EventTypes";
+import Ii8n from "../util/i18n";
+import Timespan from "../model/Timespan";
 
 
 const URL = 'https://github.com/trending/'
-const THEME_COLOR = '#678'
 const TRENDING_PAGE_REFRESH_NOTIFY = 'TRENDING_PAGE_REFRESH_NOTIFY'
 const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_trending);
 
@@ -38,7 +38,8 @@ class TrendingPage extends Component<Props> {
         this.tabs = ['C', 'Objective-C', 'Java', 'JavaScript', 'Python', 'PHP'];
         this.preTheme = null;
         this.state = {
-            timeSpan: Timespans[0],
+            timeSpans: [new Timespan(Ii8n('trending_daily'), 'since=daily'), new Timespan(Ii8n('trending_weekly'), 'since=weekly'), new Timespan(Ii8n('trending_monthly'), 'since=monthly')],
+            timeSpan: new Timespan(Ii8n('trending_daily'), 'since=daily')
         }
     }
 
@@ -86,7 +87,15 @@ class TrendingPage extends Component<Props> {
                             color: '#FFFFFF',
                             fontWeight: '400'
                         }}>
-                            趋势{this.state.timeSpan.showTex}
+                            {Ii8n('tabTrending')}
+                        </Text>
+                        <Text style={{
+                            fontSize: 14,
+                            color: '#FFFFFF',
+                            fontWeight: '400',
+                            paddingLeft: 3
+                        }}>
+                            {this.state.timeSpan.showTex}
                         </Text>
                         <MaterialIcons
                             name={'arrow-drop-down'}
@@ -105,13 +114,12 @@ class TrendingPage extends Component<Props> {
             timeSpan: tab
         })
         DeviceEventEmitter.emit(TRENDING_PAGE_REFRESH_NOTIFY, tab)
-
     }
 
     renderTrendingDialog() {
         return <TrendingDialog
             ref={dialog => this.dialog = dialog}
-            onSelect={(tab) => this.onSelectTimeSpan(tab)}
+            onSelect={(tab) => this.onSelectTimeSpan(tab)} timeSpans={this.state.timeSpans}
         />
     }
 
@@ -159,7 +167,6 @@ class TrendingPage extends Component<Props> {
     }
 }
 
-
 const mapPopularStateToProps = state => ({
     theme: state.theme.theme,
 })
@@ -174,13 +181,15 @@ class TrendingTabItem extends Component<Props> {
         const {tabLabel, timeSpan} = this.props;
         this.storeName = tabLabel;
         this.timeSpan = timeSpan;
+        this.isFavoriteChange = false;
     }
 
-
-    componentWillUnmount(): void {
-        if (this.listener) {
-            this.listener.remove();
-        }
+    componentWillUnmount() {
+        // if (this.listener) {
+        //     this.listener.remove();
+        // }
+        EventBus.getInstance().removeListener(EventTypes.favorite_change_trending);
+        EventBus.getInstance().removeListener(EventTypes.bottom_tab_select);
     }
 
     _loadData(loadMore) {
@@ -198,12 +207,22 @@ class TrendingTabItem extends Component<Props> {
         }
     }
 
-
     componentDidMount() {
         this._loadData(false);
+        //因为趋势需要实时刷新，所以点击顶部item 的时候，去刷新
         this.listener = DeviceEventEmitter.addListener(TRENDING_PAGE_REFRESH_NOTIFY, (timeSpan) => {
             this.timeSpan = timeSpan;
             this._loadData(false);
+        })
+        EventBus.getInstance().addListener(EventTypes.favorite_change_trending, this.favoriteListener = () => {
+            this.isFavoriteChange = true;
+        })
+        EventBus.getInstance().addListener(EventTypes.bottom_tab_select, this.bottomListener = data => {
+            console.log('from = '+ data.from + 'to ='+ data.to)
+            if (data.to === 1 && this.isFavoriteChange) {
+                this._loadData(false);
+                this.isFavoriteChange = false;
+            }
         })
     }
 
@@ -225,22 +244,6 @@ class TrendingTabItem extends Component<Props> {
         return URL + key + '?' + this.timeSpan.searchText;
     }
 
-    //使用react-navigation 的写法
-    // _renderItem(data) {
-    //     const item = data.item;
-    //     const {theme} = this.props;
-    //     return (
-    //         <TrendingItem projectModel={item} theme={theme} onSelect={(callback) => {
-    //             NavigationUtil.goPage('DetailPage',{
-    //                 projectModel: item,
-    //                 flag: FLAG_STORAGE.flag_trending,
-    //                 callback:callback,
-    //                 theme:theme
-    //             });
-    //         }} onFavorite={(item,isFavorite) => FavoriteUtil.onFavorite(favoriteDao,item,isFavorite,FLAG_STORAGE.flag_trending)}/>)
-    // }
-
-
     _renderItem(data) {
         const item = data.item;
         const {theme} = this.props;
@@ -259,7 +262,7 @@ class TrendingTabItem extends Component<Props> {
                 <ActivityIndicator
                     style={styles.activityIndicator}
                 />
-                <Text>正在加载更多</Text>
+                <Text style={{color: this.props.theme.themeColor,paddingLeft: 5}}>正在加载更多</Text>
             </View>
     }
 
@@ -357,7 +360,10 @@ const styles = StyleSheet.create({
         margin: 0,
     },
     listFooterStyle: {
-        alignItems: 'center'
+        flexDirection:'row',
+        justifyContent:'center',
+        alignItems: 'center',
+        height:40,
     },
     activityIndicator: {}
 });

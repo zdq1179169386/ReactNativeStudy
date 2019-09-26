@@ -1,20 +1,18 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, Button, FlatList, RefreshControl, ActivityIndicator} from 'react-native';
 import {createMaterialTopTabNavigator, createAppContainer} from 'react-navigation'
-import NavigationUtil from '../navigator/NavigationUtil'
 import {connect} from 'react-redux'
 import actions from '../action/index'
 import PopularItem from '../common/PopularItem'
 import Toast, {DURATION} from 'react-native-easy-toast'
 import NavigationBar from '../common/NavigationBar'
-import isIphoneX from "../util/ScreenUtil";
 import FavoriteDao from '../expand/dao/FavoriteDao'
 import {FLAG_STORAGE} from "../expand/dao/DataStore";
 import FavoriteUtil from "../util/FavoriteUtil";
 import EventBus from 'react-native-event-bus'
 import EventTypes from '../util/EventTypes'
 import {Actions} from "react-native-router-flux";
-
+import Ii8n from "../util/i18n";
 
 const URL = 'https://api.github.com/search/repositories?q='
 const QUERY_STR = '&sort=stars'
@@ -24,6 +22,7 @@ class PopularPage extends Component<Props> {
     constructor(props) {
         super(props);
         this.tabs = ['Java', 'Android', 'iOS', 'React', 'React Native', 'PHP'];
+        this.preTheme = null;
     }
 
     //这种方式可以加props 传入到 TopBarItem 中使用，
@@ -54,31 +53,39 @@ class PopularPage extends Component<Props> {
               labelStyle: 标题样式,
     * */
 
+    _getTopTabNaviagtor() {
+        const {theme} = this.props;
+        if (!this.appTopTab || (this.preTheme && this.preTheme != theme)) {
+            const TopTabNaviagtor = createMaterialTopTabNavigator(
+                this._createTabs(), {
+                    tabBarOptions: {
+                        tabStyle: styles.tabStyle,
+                        upperCaseLabel: false,
+                        scrollEnabled: true,
+                        style: {
+                            backgroundColor: theme.themeColor,
+                            height: 35
+                        },
+                        indicatorStyle: styles.indicatorStyle,
+                        labelStyle: styles.labelStyle,
+                    }
+                }
+            );
+            this.appTopTab = createAppContainer(TopTabNaviagtor)
+        }
+        this.preTheme = theme
+        return this.appTopTab
+    }
+
     render() {
         const {theme} = this.props;
         let statusBar = {
             backgroundColor: theme.themeColor,
             barStyle: 'light-content',
         }
-        let navigationBar = <NavigationBar title={'最热'} statusBar={statusBar} style={theme.styles.navBar}/>
-        const TopTabNaviagtor = createMaterialTopTabNavigator(
-            this._createTabs(), {
-                tabBarOptions: {
-                    tabStyle: styles.tabStyle,
-                    upperCaseLabel: false,
-                    scrollEnabled: true,
-                    style: {
-                        backgroundColor: theme.themeColor,
-                        height: 35
-                    },
-                    indicatorStyle: styles.indicatorStyle,
-                    labelStyle: styles.labelStyle,
-                }
-            }
-        );
-        const AppTopTab = createAppContainer(TopTabNaviagtor)
+        let navigationBar = <NavigationBar title={Ii8n('tabHot')} statusBar={statusBar} style={theme.styles.navBar}/>
+        const AppTopTab = this._getTopTabNaviagtor()
         return (
-
             <View style={{flex: 1}}>
                 {navigationBar}
                 <AppTopTab/>
@@ -104,13 +111,18 @@ class TopBarItem extends Component<Props> {
         this.isFavoriteChange = false;
     }
 
+    componentWillUnmount() {
+        EventBus.getInstance().removeListener(EventTypes.favorite_change_popular);
+        EventBus.getInstance().removeListener(EventTypes.bottom_tab_select);
+    }
+
     componentDidMount() {
         this._loadData();
         EventBus.getInstance().addListener(EventTypes.favorite_change_popular, this.favoriteListener = () => {
             this.isFavoriteChange = true;
         })
         EventBus.getInstance().addListener(EventTypes.bottom_tab_select, this.bottomListener = data => {
-
+            console.log('from = '+ data.from + 'to ='+ data.to)
             if (data.to === 0 && this.isFavoriteChange) {
                 this._loadData(false);
                 this.isFavoriteChange = false;
@@ -118,16 +130,11 @@ class TopBarItem extends Component<Props> {
         })
     }
 
-    componentWillUnmount(): void {
-        EventBus.getInstance().removeListener(EventTypes.favorite_change_popular);
-        EventBus.getInstance().removeListener(EventTypes.bottom_tab_select);
-    }
-
     _loadData(loadMore) {
         const {onLoadPopularData, onLoadMorePopularData} = this.props;
         let store = this._getStore();
         if (loadMore) {
-            //   加载更多
+            //加载更多
             onLoadMorePopularData(this.storeName, ++store.pageIndex, PageSize, store.items, favoriteDao, callBack => {
                 this.refs.toast.show('没有更多数据了')
             })
@@ -156,21 +163,6 @@ class TopBarItem extends Component<Props> {
         return URL + key + QUERY_STR;
     }
 
-    // _renderItem(data) {
-    //     const item = data.item;
-    //     const {theme} = this.props;
-    //     return (
-    //         <PopularItem projectModel={item} theme={theme} onSelect={(callback) => {
-    //             NavigationUtil.goPage('DetailPage',{
-    //                 projectModel: item,
-    //                 flag: FLAG_STORAGE.flag_popular,
-    //                 callback:callback,
-    //                 theme:theme,
-    //             });
-    //         }} onFavorite={(item,isFavorite) => FavoriteUtil.onFavorite(favoriteDao,item,isFavorite,FLAG_STORAGE.flag_popular)}
-    //         />)
-    // }
-
     _renderItem(data) {
         const item = data.item;
         const {theme} = this.props;
@@ -193,7 +185,7 @@ class TopBarItem extends Component<Props> {
                 <ActivityIndicator
                     style={styles.activityIndicator}
                 />
-                <Text style={{color: this.props.theme.themeColor}}>正在加载更多</Text>
+                <Text style={{color: this.props.theme.themeColor,paddingLeft: 5}}>正在加载更多</Text>
             </View>
     }
 
@@ -291,7 +283,10 @@ const styles = StyleSheet.create({
         margin: 0,
     },
     listFooterStyle: {
-        alignItems: 'center'
+        flexDirection:'row',
+        justifyContent:'center',
+        alignItems: 'center',
+        height:40,
     },
     activityIndicator: {}
 });

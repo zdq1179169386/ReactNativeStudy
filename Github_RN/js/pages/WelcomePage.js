@@ -4,22 +4,47 @@ import {
     Text,
     View,
     Image,
-    ImageBackground,
     Dimensions,
+    AsyncStorage
 } from 'react-native';
 
 import {TouchableOpacity} from "react-native-gesture-handler";
-import NavigationUtil from '../navigator/NavigationUtil';
 import Swiper from 'react-native-swiper';
 import {isIphoneX} from '../util/ScreenUtil';
 import {Actions} from 'react-native-router-flux';
+import AsyncStoragePage from "./AsyncStoragePage";
+import {TOKEN_KEY,FirstShow_KEY} from "../res/Constant";
 
 type Props = {};
 export default class WelcomePage extends Component<Props> {
 
-    componentDidMount(): void {
+    constructor(props) {
+      super(props)
         //判断是否是第一次加载，显示欢迎页
-        //再判断是否登录，没有跳转登录页，已经登录跳转主页
+        AsyncStorage.getItem(FirstShow_KEY).then(value => {
+            if (!value){
+
+            } else {
+                //再判断是否登录，没有跳转登录页，已经登录跳转主页
+                AsyncStorage.getItem(TOKEN_KEY).then(value => {
+                    if (value){
+                        //已经登录过了
+                        Actions.reset('root')
+                    } else {
+                        //未登录
+                        Actions.reset('login')
+                    }
+                }).catch(error=>{
+                    error && console.log(error.toString());
+                })
+            }
+        }).catch(error=>{
+            error && console.log(error.toString());
+        })
+    }
+
+    componentDidMount() {
+
     }
 
     render() {
@@ -36,7 +61,10 @@ export default class WelcomePage extends Component<Props> {
                 <View style={styles.slide3}>
                     <Image source={isIphoneX() ? require('../../resource/images/intro_x/xz_img_intro_x03.png') : require('../../resource/images/intro/xz_img_intro_03.png')}/>
                     <View style={styles.btnContainer}>
-                        <TouchableOpacity style={styles.button} onPress={()=> Actions.reset('login')}>
+                        <TouchableOpacity style={styles.button} onPress={()=> {
+                            AsyncStorage.setItem(FirstShow_KEY,'notfirst')
+                            Actions.reset('login')
+                        }}>
                             <Text style={styles.countText}>立即体验</Text>
                         </TouchableOpacity>
                     </View>

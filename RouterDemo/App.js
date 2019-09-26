@@ -28,6 +28,9 @@ import LoginPage from './LoginPage';
 import WelcomePage from './WelcomePage';
 import HomePage from './HomePage';
 import MyPage from './MyPage';
+import LoginSuccessPage from './LoginSuccessPage';
+import TabIcon from './TabIcon';
+import DetailPage from './DetailPage'
 
 
 export default class App extends Component<Props> {
@@ -38,26 +41,32 @@ export default class App extends Component<Props> {
             }}>
                 <Lightbox>
                     <Scene key='main'>
-                        <Scene key='WelcomePage' component={WelcomePage} hideNavBar hideTabBar></Scene>
+                        <Scene key='WelcomePage' component={WelcomePage} hideNavBar hideTabBar initial></Scene>
                     </Scene>
-                    <Scene key='LoginPage' component={LoginPage} hideTabBar></Scene>
-                    <Scene
-                        key='MainTabPage'
-                        tabs={true}
-                        lazy={true}
-                        wrap={false}
-                        showLabel={false}
-                        tabBarPosition={'bottom'}
-                        title=''
-                        tabBarStyle={{
-                            height: 49,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            backgroundColor: '#ececec',
-                        }}>
-                        <Scene key='HomePage' component={HomePage} title='home'></Scene>
-                        <Scene key='MyPage' component={MyPage} title='My'></Scene>
+                    <Scene key='login'>
+                        <Scene key='LoginPage' component={LoginPage} hideTabBar></Scene>
+                        <Scene key='LoginSuccessPage' component={LoginSuccessPage} hideTabBar></Scene>
                     </Scene>
+                   <Scene key={'root'}>
+                       <Scene
+                           key='MainTabPage'
+                           tabs={true}
+                           lazy={true}
+                           wrap={false}
+                           showLabel={false}
+                           tabBarPosition={'bottom'}
+                           title=''
+                           tabBarStyle={{
+                               height: 49,
+                               alignItems: 'center',
+                               justifyContent: 'center',
+                               backgroundColor: '#ececec',
+                           }}>
+                           <Scene key='HomePage' component={HomePage} title='home' icon={TabIcon} tabIconName={'home'}></Scene>
+                           <Scene key='MyPage' component={MyPage} title='My' icon={TabIcon} tabIconName={'user'}></Scene>
+                       </Scene>
+                       <Scene key='DetailPage' component={DetailPage} title='Detail'/>
+                   </Scene>
                 </Lightbox>
             </Router>
         );

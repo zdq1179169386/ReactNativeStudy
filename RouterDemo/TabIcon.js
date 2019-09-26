@@ -15,8 +15,6 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather'
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import Ii8n from "../util/i18n";
 
 
 
@@ -30,18 +28,18 @@ const propTypes = {
 /**
  * 底部Tab
  */
-class TabIcon extends Component {
+export default class TabIcon extends Component {
 
     constructor(props) {
         super(props)
     }
 
     render() {
-        let color = this.props.focused ? this.props.theme.themeColor : '#a6aaaf';
+        let color = this.props.focused ? 'red' : '#a6aaaf';
         return (
             <View style={styles.centered}>
                 <Icon name={this.props.tabIconName} size={20} color={color}/>
-                <Text style={[{color: color}, {fontSize: 14},{paddingTop: 3}]}>{Ii8n(this.props.title)}</Text>
+                <Text style={[{color: color}, {fontSize: 14}]}>{this.props.title}</Text>
             </View>
         );
     }
@@ -53,15 +51,6 @@ TabIcon.propTypes = propTypes;
 const  styles = StyleSheet.create({
     centered: {
         justifyContent: "center",
-        alignItems: "center",
-        paddingTop: 3
+        alignItems: "center"
     }
 })
-
-const mapStateToProps = state => ({
-    theme: state.theme.theme,
-});
-
-export default connect(mapStateToProps)(TabIcon);
-
-

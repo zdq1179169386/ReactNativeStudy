@@ -8,8 +8,8 @@ export default class WelcomePage extends  Component<Props>{
         return(
             <View style={styles.container}>
                 <Text>WelcomePage</Text>
-                <Button title={'跳转登录页'} onPress={() => Actions.reset('LoginPage')}/>
-                <Button title={'跳转主页'} onPress={() => Actions.reset('MainTabPage')}/>
+                <Button title={'跳转登录页'} onPress={() => Actions.reset('login')}/>
+                <Button title={'跳转主页'} onPress={() => Actions.reset('root')}/>
             </View>
         )
     }

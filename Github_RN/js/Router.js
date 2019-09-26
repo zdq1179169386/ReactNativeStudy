@@ -2,10 +2,10 @@ import React, {Component} from 'react';
 import {
     Scene,
     Router,
-    Lightbox, Drawer
+    Lightbox, Actions
 } from 'react-native-router-flux';
 
-import {StyleSheet} from 'react-native';
+import {StyleSheet, StatusBar} from 'react-native';
 import WelcomePage from './pages/WelcomePage';
 import LoginPage from './pages/LoginPage';
 import LoginSuccessPage from './pages/LoginSuccessPage';
@@ -16,8 +16,16 @@ import FavoritePage from "./pages/FavoritePage";
 import MyPage from "./pages/MyPage";
 import CutomThemePage from "./pages/CutomThemePage";
 import DetailPage from "./pages/DetailPage";
+import CustomLanguagePage from './pages/CustomLanguagePage';
+import RootPage from './pages/RootPage';
+import Ii8n from './util/i18n';
+import EventBus from "react-native-event-bus";
+import EventTypes from "./util/EventTypes";
 
- const getRouter = () => {
+var selectedIndex = 0
+
+
+const getRouter = () => {
     return (
         <Router getSceneStyle={() => {
             return styles.getSceneStyle;
@@ -30,7 +38,9 @@ import DetailPage from "./pages/DetailPage";
                     <Scene key='LoginPage' component={LoginPage} hideTabBar></Scene>
                     <Scene key='LoginSuccessPage' component={LoginSuccessPage} hideTabBar></Scene>
                 </Scene>
-                <Scene key={'root'}>
+                <Scene key={'RootPage'} component={RootPage} initial hideNavBar hideTabBar/>
+                <Scene key={'root'}
+                >
                     <Scene
                         key='MainTabPage'
                         tabs={true}
@@ -46,13 +56,55 @@ import DetailPage from "./pages/DetailPage";
                             justifyContent: 'center',
                             backgroundColor: '#ececec',
                         }}>
-                        <Scene key='PopularPage' component={PopularPage} hideNavBar={true} title='home' icon={TabIcon} tabIconName={'home'}/>
-                        <Scene key='TrendingPage' component={TrendingPage} hideNavBar={true} title='trending' icon={TabIcon} tabIconName={'activity'}/>
-                        <Scene key='FavoritePage' component={FavoritePage} hideNavBar={true} title='favorite' icon={TabIcon} tabIconName={'heart'}/>
-                        <Scene key='MyPage' component={MyPage} hideNavBar={true} icon={TabIcon} title='my' tabIconName={'user'}/>
+                        <Scene key='PopularPage' component={PopularPage} hideNavBar={true} title={'tabHot'}
+                               icon={TabIcon}
+                               tabIconName={'home'}
+                               tabBarOnPress={() => {
+                                   Actions.PopularPage()
+                                   EventBus.getInstance().fireEvent(EventTypes.bottom_tab_select, {
+                                       from: selectedIndex,
+                                       to: 0
+                                   })
+                                   selectedIndex = 0
+                               }}
+                        />
+                        <Scene key='TrendingPage' component={TrendingPage} hideNavBar={true} title={'tabTrending'}
+                               icon={TabIcon} tabIconName={'activity'}
+                               tabBarOnPress={() => {
+                                   Actions.TrendingPage()
+                                   EventBus.getInstance().fireEvent(EventTypes.bottom_tab_select, {
+                                       from: selectedIndex,
+                                       to: 1
+                                   })
+                                   selectedIndex = 1
+                               }}
+                        />
+                        <Scene key='FavoritePage' component={FavoritePage} hideNavBar={true} title={'tabFavorite'}
+                               icon={TabIcon} tabIconName={'heart'}
+                               tabBarOnPress={() => {
+                                   Actions.FavoritePage()
+                                   EventBus.getInstance().fireEvent(EventTypes.bottom_tab_select, {
+                                       from: selectedIndex,
+                                       to: 2
+                                   })
+                                   selectedIndex = 2
+                               }}
+                        />
+                        <Scene key='MyPage' component={MyPage} hideNavBar={true} icon={TabIcon} title={'tabMy'}
+                               tabIconName={'user'}
+                               tabBarOnPress={() => {
+                                   Actions.MyPage()
+                                   EventBus.getInstance().fireEvent(EventTypes.bottom_tab_select, {
+                                       from: selectedIndex,
+                                       to: 3
+                                   })
+                                   selectedIndex = 3
+                               }}
+                        />
                     </Scene>
                     <Scene key='CutomThemePage' component={CutomThemePage} hideNavBar={true}/>
                     <Scene key='DetailPage' component={DetailPage} hideNavBar={true}/>
+                    <Scene key='CustomLanguagePage' component={CustomLanguagePage} hideNavBar={true}></Scene>
                 </Scene>
             </Lightbox>
         </Router>

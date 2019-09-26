@@ -1,18 +1,28 @@
 import React, {Component} from 'react';
-import { ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
-import NavigationUtil from "../navigator/NavigationUtil";
+import {ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import NavigationBar from '../common/NavigationBar'
 import Feather from 'react-native-vector-icons/Feather'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import isIphoneX from '../util/ScreenUtil'
 import More_Menu from '../common/More_Menu'
 import ViewUtil from '../util/ViewUtil'
 import {connect} from 'react-redux'
 import actions from '../action/index'
 import {ThemeFactory} from "../res/ThemeFactory";
 import {Actions} from "react-native-router-flux";
+import Ii8n from "../util/i18n";
+import Octicons from "react-native-vector-icons/Octicons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-  class MyPage extends Component<Props> {
+class MyPage extends Component<Props> {
+    constructor(props) {
+        super(props)
+        this.state = {
+            menus: {
+                Custom_Language:{name: Ii8n('customLanguage'),Icons: Octicons, icon:'check'},
+                Custom_Theme:{name: Ii8n('customTheme'),Icons: Octicons, icon:'check'},
+            }
+        }
+    }
     _getLeftBtn(callBack) {
         return <View style={{padding: 8, paddingLeft: 15}}>
             <TouchableOpacity onPress={callBack}>
@@ -44,27 +54,25 @@ import {Actions} from "react-native-router-flux";
         const {theme} = this.props;
         let routeName, params = {};
         switch (menu) {
-            case More_Menu.Tutorial:
-                routeName='WebViewPage';
-                params.title='教程';
-                params.url='http://www.baidu.com';
+            case this.state.menus.Custom_Theme:
+                routeName = 'CutomThemePage';
+                params.title = Ii8n('customTheme');
                 params.theme = theme
                 break
-            case More_Menu.Custom_Theme:
-                routeName='CutomThemePage';
-                params.title='主题';
+            case this.state.menus.Custom_Language:
+                routeName = 'CustomLanguagePage';
+                params.title = Ii8n('customLanguage');
                 params.theme = theme
                 break
         }
-        if (routeName){
-            // NavigationUtil.goPage(routeName,params);
-            Actions.push('CutomThemePage',params);
+        if (routeName) {
+            Actions.push(routeName, params);
         }
     }
 
     getItem(menu) {
         const {theme} = this.props;
-        return ViewUtil.getMenuItem(()=>this.onClick(menu),menu,theme.themeColor)
+        return ViewUtil.getMenuItem(() => this.onClick(menu), menu, theme.themeColor)
     }
 
     render() {
@@ -74,8 +82,8 @@ import {Actions} from "react-native-router-flux";
             backgroundColor: theme.themeColor,
             barStyle: 'light-content',
         }
-        let navigationBar = <NavigationBar title={'我的'} style={theme.styles.navBar} statusBar={statusBar}
-                                            rightBtn={this._getRightBtn()}/>
+        let navigationBar = <NavigationBar title={Ii8n('tabMy')} style={theme.styles.navBar} statusBar={statusBar}
+                                           rightBtn={this._getRightBtn()}/>
         return (
             <View style={styles.container}>
                 {navigationBar}
@@ -96,26 +104,10 @@ import {Actions} from "react-native-router-flux";
                                           style={{marginRight: 10, color: theme.themeColor}}/>
                             </View>
                         </TouchableOpacity>
+                        <Text style={styles.groupTitle}>{Ii8n('setting')}</Text>
+                        {this.getItem(this.state.menus.Custom_Language)}
                         {ViewUtil.getLine()}
-                        {this.getItem(More_Menu.Tutorial)}
-                        {/*趋势管理*/}
-                        <Text style={styles.groupTitle}>趋势管理</Text>
-                        {this.getItem(More_Menu.Custom_Language)}
-                        {ViewUtil.getLine()}
-                        {this.getItem(More_Menu.Sort_Language)}
-
-                        <Text style={styles.groupTitle}>最热模块</Text>
-                        {this.getItem(More_Menu.Custom_Key)}
-                        {this.getItem(More_Menu.Sort_Key)}
-                        {ViewUtil.getLine()}
-                        {this.getItem(More_Menu.Remove_Key)}
-
-                        <Text style={styles.groupTitle}>设置</Text>
-                        {this.getItem(More_Menu.Custom_Theme)}
-                        {ViewUtil.getLine()}
-                        {this.getItem(More_Menu.About_Author)}
-                        {ViewUtil.getLine()}
-                        {this.getItem(More_Menu.Feedback)}
+                        {this.getItem(this.state.menus.Custom_Theme)}
                     </View>
                 </ScrollView>
             </View>
@@ -142,11 +134,11 @@ const styles = StyleSheet.create({
         padding: 10,
         height: 90,
     },
-    groupTitle:{
-        marginLeft:10,
+    groupTitle: {
+        marginLeft: 10,
         marginTop: 10,
-        marginBottom:5,
-        fontSize:12,
-        color:'gray'
+        marginBottom: 5,
+        fontSize: 12,
+        color: 'gray'
     }
 });

@@ -1,6 +1,5 @@
 import React,{Component} from 'react'
 import {Button, Platform, StyleSheet, Text, View,TextInput} from 'react-native';
-import NavigationUtil from "../navigator/NavigationUtil";
 
 
 

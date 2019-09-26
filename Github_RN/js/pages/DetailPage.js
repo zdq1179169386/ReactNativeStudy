@@ -3,7 +3,6 @@ import {Platform, StyleSheet, Text, View, Button, TouchableOpacity, WebView} fro
 import NavigationBar from "../common/NavigationBar";
 import ViewUtil from '../util/ViewUtil'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import NavigationUtil from "../navigator/NavigationUtil";
 import isIphoneX from '../util/ScreenUtil'
 import BackPressComponent from "../common/BackPressComponent";
 import FavoriteDao from "../expand/dao/FavoriteDao";

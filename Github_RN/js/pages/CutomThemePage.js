@@ -5,11 +5,12 @@ import isIphoneX from '../util/ScreenUtil'
 import ThemeDao from "../expand/dao/ThemeDao";
 import {ThmemeFlags, ThemeFactory} from "../res/ThemeFactory";
 import ViewUtil from "../util/ViewUtil";
-import NavigationUtil from "../navigator/NavigationUtil";
 import {connect} from 'react-redux'
 import actions from '../action/index'
 import SafeAreaViewPlus from '../common/SafeAreaViewPlus'
 import GlobalStyles from "../res/GlobalStyles";
+import {Actions} from "react-native-router-flux";
+import Ii8n from "../util/i18n";
 
 
 class CutomThemePage extends Component<Props> {
@@ -17,7 +18,6 @@ class CutomThemePage extends Component<Props> {
     constructor(props) {
         super(props)
         this.params = this.props.navigation.state.params;
-
         this.themeDao = new ThemeDao();
     }
 
@@ -25,7 +25,7 @@ class CutomThemePage extends Component<Props> {
         const {onThemeChange} = this.props;
         this.themeDao.save(ThmemeFlags[themekey]);
         onThemeChange(ThemeFactory.createTheme(ThmemeFlags[themekey]));
-        NavigationUtil.goBack(this.props.navigation)
+        Actions.pop();
     }
 
     getThemeItems(themekey) {
@@ -66,9 +66,9 @@ class CutomThemePage extends Component<Props> {
             backgroundColor: theme.themeColor,
             barStyle: 'light-content',
         }
-        let navigationBar = <NavigationBar title={'主题'} style={theme.styles.navBar} statusBar={statusBar}
+        let navigationBar = <NavigationBar title={Ii8n('customTheme')} style={theme.styles.navBar} statusBar={statusBar}
                                            leftBtn={ViewUtil.getLeftBackBtn(() => {
-                                               NavigationUtil.goBack(this.props.navigation);
+                                               Actions.pop();
                                            })}/>
         return (
             <View>
