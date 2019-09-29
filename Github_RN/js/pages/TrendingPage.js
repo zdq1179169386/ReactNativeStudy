@@ -11,8 +11,7 @@ import {
 } from 'react-native';
 import {createMaterialTopTabNavigator, createAppContainer} from 'react-navigation'
 import {connect} from 'react-redux'
-import actions from '../action/index'
-import Toast, {DURATION} from 'react-native-easy-toast'
+import actions from '../store/action/index'
 import NavigationBar from '../common/NavigationBar'
 import TrendingItem from '../common/TrendingItem'
 import TrendingDialog, {Timespans} from '../common/TrendingDialog'
@@ -25,6 +24,7 @@ import EventBus from "react-native-event-bus";
 import EventTypes from "../util/EventTypes";
 import Ii8n from "../util/i18n";
 import Timespan from "../model/Timespan";
+import Toast from '../common/ToastProxy'
 
 
 const URL = 'https://github.com/trending/'
@@ -185,9 +185,9 @@ class TrendingTabItem extends Component<Props> {
     }
 
     componentWillUnmount() {
-        // if (this.listener) {
-        //     this.listener.remove();
-        // }
+        if (this.listener) {
+            this.listener.remove();
+        }
         EventBus.getInstance().removeListener(EventTypes.favorite_change_trending);
         EventBus.getInstance().removeListener(EventTypes.bottom_tab_select);
     }
@@ -198,7 +198,7 @@ class TrendingTabItem extends Component<Props> {
         if (loadMore) {
             //   加载更多
             onLoadMoreTrendingData(this.storeName, ++store.pageIndex, PageSize, store.items, favoriteDao, callBack => {
-                this.refs.toast.show('没有更多数据了')
+                Toast(Ii8n('noMoreData'))
             })
         } else {
             //下来刷新
@@ -262,10 +262,9 @@ class TrendingTabItem extends Component<Props> {
                 <ActivityIndicator
                     style={styles.activityIndicator}
                 />
-                <Text style={{color: this.props.theme.themeColor,paddingLeft: 5}}>正在加载更多</Text>
+                <Text style={{color: this.props.theme.themeColor,paddingLeft: 5}}>{Ii8n('loadingMore')}</Text>
             </View>
     }
-
 
     render() {
         let store = this._getStore();
@@ -313,7 +312,6 @@ class TrendingTabItem extends Component<Props> {
                     //     this.canLoadMore = false;
                     // }}
                 />
-                <Toast ref={'toast'} position={'center'}/>
             </View>
         )
     }

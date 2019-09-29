@@ -8,7 +8,9 @@ import {
 const X_WIDTH = 375;
 const X_HEIGHT = 812;
 
-const { height: D_HEIGHT, width: D_WIDTH } = Dimensions.get('window');
+export const D_WIDTH = Dimensions.get('window').width;
+export const D_HEIGHT = Dimensions.get('window').height;
+
 
 const { PlatformConstants = {} } = NativeModules;
 const { minor = 0 } = PlatformConstants.reactNativeVersion || {};

@@ -17,36 +17,6 @@ import {TOKEN_KEY,FirstShow_KEY} from "../res/Constant";
 
 type Props = {};
 export default class WelcomePage extends Component<Props> {
-
-    constructor(props) {
-      super(props)
-        //判断是否是第一次加载，显示欢迎页
-        AsyncStorage.getItem(FirstShow_KEY).then(value => {
-            if (!value){
-
-            } else {
-                //再判断是否登录，没有跳转登录页，已经登录跳转主页
-                AsyncStorage.getItem(TOKEN_KEY).then(value => {
-                    if (value){
-                        //已经登录过了
-                        Actions.reset('root')
-                    } else {
-                        //未登录
-                        Actions.reset('login')
-                    }
-                }).catch(error=>{
-                    error && console.log(error.toString());
-                })
-            }
-        }).catch(error=>{
-            error && console.log(error.toString());
-        })
-    }
-
-    componentDidMount() {
-
-    }
-
     render() {
         return (
             <Swiper style={styles.wrapper} showsButtons={false} loop={false} showsPagination={false}>

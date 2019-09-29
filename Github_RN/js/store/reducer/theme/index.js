@@ -1,5 +1,5 @@
 import Types from '../../action/types';
-import {ThemeFactory,ThmemeFlags}  from '../../res/ThemeFactory'
+import {ThemeFactory,ThmemeFlags}  from '../../../res/ThemeFactory'
 
 const  defaultState = {
     theme: ThemeFactory.createTheme(ThmemeFlags.Default)

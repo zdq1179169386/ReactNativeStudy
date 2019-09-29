@@ -11,43 +11,48 @@ import {
 
 import {Actions} from 'react-native-router-flux';
 import {TOKEN_KEY,FirstShow_KEY} from "../res/Constant";
+import actions from "../store/action";
+import {connect} from "react-redux";
 
 type Props = {};
-export default class WelcomePage extends Component<Props> {
-    constructor(props) {
-      super(props)
+ class RootPage extends Component<Props> {
+    componentDidMount() {
         //判断是否是第一次加载，显示欢迎页
         AsyncStorage.getItem(FirstShow_KEY).then(value => {
-            console.log('value = '+ value)
             if (!value){
                 //显示欢迎页
                 Actions.reset('main')
             } else {
-                //再判断是否登录，没有跳转登录页，已经登录跳转主页
-                AsyncStorage.getItem(TOKEN_KEY).then(value => {
-                    console.log('token ='+ value)
-                    if (value){
+                const {initUserInfo} = this.props;
+                initUserInfo((res) => {
+                    if (res){
                         //已经登录过了
                         Actions.reset('root')
                     } else {
                         //未登录
                         Actions.reset('login')
                     }
-                }).catch(error=>{
-                    error && console.log(error.toString());
                 })
             }
         }).catch(error=>{
             error && console.log(error.toString());
         })
     }
-    render() {
+     render() {
         return (
           <View/>
         );
     }
 }
 
-const styles = StyleSheet.create({
-    wrapper: {}
-});
+
+const mapStateToProps = state => ({
+    theme: state.theme.theme,
+})
+
+const mapDispatchToProps = dispatch => ({
+    initUserInfo : (callback) => dispatch(actions.initUserInfo(callback))
+})
+
+export default connect(mapStateToProps,mapDispatchToProps)(RootPage);
+

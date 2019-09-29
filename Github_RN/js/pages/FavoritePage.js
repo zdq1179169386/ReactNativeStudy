@@ -2,9 +2,8 @@ import React, {Component} from 'react';
 import {StyleSheet, View, FlatList, RefreshControl} from 'react-native';
 import {createMaterialTopTabNavigator, createAppContainer} from 'react-navigation'
 import {connect} from 'react-redux'
-import actions from '../action/index'
+import actions from '../store/action/index'
 import PopularItem from '../common/PopularItem'
-import Toast, {DURATION} from 'react-native-easy-toast'
 import NavigationBar from '../common/NavigationBar'
 import FavoriteDao from '../expand/dao/FavoriteDao'
 import {FLAG_STORAGE} from "../expand/dao/DataStore";
@@ -14,6 +13,7 @@ import EventBus from 'react-native-event-bus'
 import EventTypes from '../util/EventTypes'
 import {Actions} from "react-native-router-flux";
 import Ii8n from "../util/i18n";
+import Toast from "../common/ToastProxy";
 
 
 const favoriteDao = new FavoriteDao(FLAG_STORAGE.flag_popular);
@@ -172,7 +172,6 @@ class FavoriteBarItem extends Component<Props> {
                         />
                     }
                 />
-                <Toast ref={'toast'} position={'center'}/>
             </View>
         )
     }

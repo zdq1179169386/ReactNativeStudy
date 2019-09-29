@@ -9,7 +9,6 @@ import {changeLocale} from './util/i18n'
 
 
 export default class App extends Component<Props> {
-
     constructor() {
         super();
         this.state = {
@@ -18,7 +17,6 @@ export default class App extends Component<Props> {
         }
         //获取上次存储的语言
         getLanguageCurrent().then((res) => {
-            console.log('获取上次存储的语言')
             changeLocale(res.language)
             this.setState({
                 show: true

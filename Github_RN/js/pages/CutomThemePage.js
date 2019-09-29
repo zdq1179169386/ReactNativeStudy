@@ -6,7 +6,7 @@ import ThemeDao from "../expand/dao/ThemeDao";
 import {ThmemeFlags, ThemeFactory} from "../res/ThemeFactory";
 import ViewUtil from "../util/ViewUtil";
 import {connect} from 'react-redux'
-import actions from '../action/index'
+import actions from '../store/action/index'
 import SafeAreaViewPlus from '../common/SafeAreaViewPlus'
 import GlobalStyles from "../res/GlobalStyles";
 import {Actions} from "react-native-router-flux";

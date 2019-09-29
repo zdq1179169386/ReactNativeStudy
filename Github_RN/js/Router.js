@@ -21,6 +21,10 @@ import RootPage from './pages/RootPage';
 import Ii8n from './util/i18n';
 import EventBus from "react-native-event-bus";
 import EventTypes from "./util/EventTypes";
+import SettingPage from "./pages/SettingPage";
+import PublicReposPage from "./pages/PublicReposPage";
+import FollowersPage from "./pages/FollowersPage";
+import FollowingPage from "./pages/FollowingPage";
 
 var selectedIndex = 0
 
@@ -35,7 +39,7 @@ const getRouter = () => {
                     <Scene key='WelcomePage' component={WelcomePage} hideNavBar hideTabBar initial></Scene>
                 </Scene>
                 <Scene key='login'>
-                    <Scene key='LoginPage' component={LoginPage} hideTabBar></Scene>
+                    <Scene key='LoginPage' component={LoginPage} hideTabBar hideNavBar></Scene>
                     <Scene key='LoginSuccessPage' component={LoginSuccessPage} hideTabBar></Scene>
                 </Scene>
                 <Scene key={'RootPage'} component={RootPage} initial hideNavBar hideTabBar/>
@@ -105,6 +109,10 @@ const getRouter = () => {
                     <Scene key='CutomThemePage' component={CutomThemePage} hideNavBar={true}/>
                     <Scene key='DetailPage' component={DetailPage} hideNavBar={true}/>
                     <Scene key='CustomLanguagePage' component={CustomLanguagePage} hideNavBar={true}></Scene>
+                    <Scene key='SettingPage' component={SettingPage} hideNavBar={true}/>
+                    <Scene key='PublicReposPage' component={PublicReposPage} hideNavBar={true}/>
+                    <Scene key='FollowersPage' component={FollowersPage} hideNavBar={true}/>
+                    <Scene key='FollowingPage' component={FollowingPage} hideNavBar={true}/>
                 </Scene>
             </Lightbox>
         </Router>

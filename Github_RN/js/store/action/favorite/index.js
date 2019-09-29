@@ -1,11 +1,11 @@
 import Types from '../types'
-import DataStore, {FLAG_STORAGE} from '../../expand/dao/DataStore'
-import FavoriteDao from '../../expand/dao/FavoriteDao'
-import ProjectModel from "../../model/ProjectModel";
-import Util from "../../util/Util";
+import DataStore, {FLAG_STORAGE} from '../../../expand/dao/DataStore'
+import FavoriteDao from '../../../expand/dao/FavoriteDao'
+import ProjectModel from "../../../model/ProjectModel";
+import Util from "../../../util/Util";
+
 
 export function onLoadFavoriteData(flag, isShowLoading) {
-
     return dispatch => {
         if (isShowLoading)
         {
@@ -14,7 +14,6 @@ export function onLoadFavoriteData(flag, isShowLoading) {
                 storeName: flag
             });
         }
-
         new FavoriteDao(flag).getAllItems().then(items => {
             let results = [];
             for (let i = 0, len = items.length; i < len; i++){
@@ -33,10 +32,7 @@ export function onLoadFavoriteData(flag, isShowLoading) {
                 storeName:flag,
             })
         })
-
-
     }
-
 }
 
 export function onLoadMorePopularData(storeName, pageIndex, pageSize, dataArray = [], favoriteDao,callBack) {

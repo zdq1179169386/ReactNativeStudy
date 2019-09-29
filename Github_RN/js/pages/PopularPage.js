@@ -2,9 +2,8 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, Button, FlatList, RefreshControl, ActivityIndicator} from 'react-native';
 import {createMaterialTopTabNavigator, createAppContainer} from 'react-navigation'
 import {connect} from 'react-redux'
-import actions from '../action/index'
+import actions from '../store/action/index'
 import PopularItem from '../common/PopularItem'
-import Toast, {DURATION} from 'react-native-easy-toast'
 import NavigationBar from '../common/NavigationBar'
 import FavoriteDao from '../expand/dao/FavoriteDao'
 import {FLAG_STORAGE} from "../expand/dao/DataStore";
@@ -13,6 +12,8 @@ import EventBus from 'react-native-event-bus'
 import EventTypes from '../util/EventTypes'
 import {Actions} from "react-native-router-flux";
 import Ii8n from "../util/i18n";
+import Toast from "../common/ToastProxy";
+
 
 const URL = 'https://api.github.com/search/repositories?q='
 const QUERY_STR = '&sort=stars'
@@ -136,7 +137,7 @@ class TopBarItem extends Component<Props> {
         if (loadMore) {
             //加载更多
             onLoadMorePopularData(this.storeName, ++store.pageIndex, PageSize, store.items, favoriteDao, callBack => {
-                this.refs.toast.show('没有更多数据了')
+                Toast(Ii8n('noMoreData'))
             })
         } else {
             //下来刷新
@@ -185,7 +186,7 @@ class TopBarItem extends Component<Props> {
                 <ActivityIndicator
                     style={styles.activityIndicator}
                 />
-                <Text style={{color: this.props.theme.themeColor,paddingLeft: 5}}>正在加载更多</Text>
+                <Text style={{color: this.props.theme.themeColor,paddingLeft: 5}}>{Ii8n('loadingMore')}</Text>
             </View>
     }
 
@@ -212,7 +213,7 @@ class TopBarItem extends Component<Props> {
                     ListFooterComponent={this._getListFooter()}
                     onEndReached={() => {
                         console.log('onEndReached')
-                        if (this.canLoadMore) {
+                        if (this.canLoadMore) {this.canLoadMore
                             this._loadData(true);
                             this.canLoadMore = false;
                         }
@@ -235,7 +236,6 @@ class TopBarItem extends Component<Props> {
                     //     this.canLoadMore = false;
                     // }}
                 />
-                <Toast ref={'toast'} position={'center'}/>
             </View>
         )
     }

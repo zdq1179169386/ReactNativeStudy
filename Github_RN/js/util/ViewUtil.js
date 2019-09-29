@@ -39,16 +39,16 @@ export default class ViewUtil {
         </View>
     }
 
-//    设置页面的item
+//设置页面的item
     static getSettingItem(callBack, text, color, Icons, icon, expandableIcon) {
         return (<TouchableOpacity onPress={callBack}>
             <View style={styles.item_container}>
                 <View style={{alignItems: 'center', flexDirection: 'row'}}>
                     {Icons && icon ?
                         <Icons name={icon} size={16} style={{color: color, marginRight: 10}}/> :
-                        <View style={{opacity: 1, width: 16, height: 16, marginRight10}}></View>
+                        <View style={{opacity: 1, width: 16, height: 16, marginRight:10}}></View>
                     }
-                    <Text>{text}</Text>
+                    <Text style={{fontSize: 16}}>{text}</Text>
                 </View>
                 <Ionicons
                     name={expandableIcon ? expandableIcon : 'ios-arrow-forward'}
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     item_container: {
         backgroundColor: 'white',
         padding: 10,
-        height: 45,
+        height: 50,
         alignItems: 'center',
         justifyContent: 'space-between',
         flexDirection: 'row',

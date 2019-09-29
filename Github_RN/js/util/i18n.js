@@ -24,6 +24,11 @@ I18n.translations = {
         setting:'设置',
         customLanguage:'自定义语言',
         customTheme:'自定义主题',
+        loadingMore: '正在加载更多',
+        noMoreData: '没有更多数据了',
+        public_repos: '仓库',
+        followers: '粉丝',
+        following: '关注',
     },
     'en': {
         appName: 'Github_RN',
@@ -37,11 +42,15 @@ I18n.translations = {
         setting:'setting',
         customLanguage:'customLanguage',
         customTheme:'customTheme',
+        loadingMore: 'loading more data',
+        noMoreData: 'no more data',
+        public_repos: 'public_repos',
+        followers: 'followers',
+        following: 'following'
     }
 };
 
 export const changeLocale = function (multilingual) {
-    console.log('multilingual ='+multilingual)
     if (multilingual === 'local' || !multilingual) {
         if (__DEV__) {
             if (RNI18n !== undefined && typeof RNI18n !== 'undefined') {

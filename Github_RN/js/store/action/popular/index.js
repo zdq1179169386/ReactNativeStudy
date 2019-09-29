@@ -1,8 +1,8 @@
 import Types from '../types'
-import DataStore, {FLAG_STORAGE} from '../../expand/dao/DataStore'
-import FavoriteDao from '../../expand/dao/FavoriteDao'
-import ProjectModel from "../../model/ProjectModel";
-import Util from "../../util/Util";
+import DataStore, {FLAG_STORAGE} from '../../../expand/dao/DataStore'
+import FavoriteDao from '../../../expand/dao/FavoriteDao'
+import ProjectModel from "../../../model/ProjectModel";
+import Util from "../../../util/Util";
 
 export function onLoadPopularData(storeName, url, pageSize, favoriteDao) {
 
@@ -52,10 +52,8 @@ export function onLoadMorePopularData(storeName, pageIndex, pageSize, dataArray 
                     })
                 })
             }
-
         }, 500)
     }
-
 }
 
 function handleData(dispatch, storeName, data, pageSize, favoriteDao) {

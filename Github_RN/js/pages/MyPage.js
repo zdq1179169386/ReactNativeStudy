@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
-import {ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {ScrollView, StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
 import NavigationBar from '../common/NavigationBar'
 import Feather from 'react-native-vector-icons/Feather'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import More_Menu from '../common/More_Menu'
 import ViewUtil from '../util/ViewUtil'
 import {connect} from 'react-redux'
-import actions from '../action/index'
+import actions from '../store/action/index'
 import {ThemeFactory} from "../res/ThemeFactory";
 import {Actions} from "react-native-router-flux";
 import Ii8n from "../util/i18n";
@@ -16,30 +16,29 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 class MyPage extends Component<Props> {
     constructor(props) {
         super(props)
+        this.public_repos = Ii8n('public_repos');
+        this.followers = Ii8n('followers');
+        this.following = Ii8n('following');
         this.state = {
             menus: {
-                Custom_Language:{name: Ii8n('customLanguage'),Icons: Octicons, icon:'check'},
-                Custom_Theme:{name: Ii8n('customTheme'),Icons: Octicons, icon:'check'},
+                public_repos: {name: '仓库', Icons: Octicons, icon: 'repo'},
+                followers: {name: '粉丝', Icons: Octicons, icon: 'repo'},
+                following: {name: '关注', Icons: Octicons, icon: 'repo'},
             }
         }
     }
-    _getLeftBtn(callBack) {
-        return <View style={{padding: 8, paddingLeft: 15}}>
-            <TouchableOpacity onPress={callBack}>
-                <Ionicons
-                    name={'ios-arrow-back'}
-                    size={26}
-                    style={{color: 'white'}}
-                />
-            </TouchableOpacity>
-        </View>
+
+    componentDidMount() {
+        // debugger
+        // const {getUserInfo} = this.props;
+        // getUserInfo();
     }
 
-    _getRightBtn() {
+    _getSearchBtn() {
         return <View>
             <TouchableOpacity onPress={() => {
             }}>
-                <View style={{padding: 5, marginRight: 8}}>
+                <View style={{padding: 5, marginLeft: 8}}>
                     <Feather
                         name={'search'}
                         size={24}
@@ -50,40 +49,90 @@ class MyPage extends Component<Props> {
         </View>
     }
 
-    onClick(menu) {
+    _getSettingBtn() {
+        return <View>
+            <TouchableOpacity onPress={() => {
+                Actions.push('SettingPage')
+            }}>
+                <View style={{padding: 5, marginRight: 8}}>
+                    <Feather
+                        name={'settings'}
+                        size={24}
+                        style={{color: 'white'}}
+                    />
+                </View>
+            </TouchableOpacity>
+        </View>
+    }
+
+    onClick(name) {
+        name = name + ''
         const {theme} = this.props;
         let routeName, params = {};
-        switch (menu) {
-            case this.state.menus.Custom_Theme:
-                routeName = 'CutomThemePage';
-                params.title = Ii8n('customTheme');
-                params.theme = theme
-                break
-            case this.state.menus.Custom_Language:
-                routeName = 'CustomLanguagePage';
-                params.title = Ii8n('customLanguage');
-                params.theme = theme
-                break
+        if (name.indexOf(this.public_repos) != -1) {
+            routeName = 'PublicReposPage';
+            params.title = this.public_repos;
+            params.theme = theme
         }
-        if (routeName) {
+        if (name.indexOf(this.followers) != -1) {
+            routeName = 'FollowersPage';
+            params.title = this.followers;
+            params.theme = theme
+        }
+        if (name.indexOf(this.following) != -1) {
+            routeName = 'FollowingPage';
+            params.title = this.following;
+            params.theme = theme
+        }
+        if (routeName){
             Actions.push(routeName, params);
         }
     }
 
-    getItem(menu) {
+    getItem(name,count, Icons, icon) {
         const {theme} = this.props;
-        return ViewUtil.getMenuItem(() => this.onClick(menu), menu, theme.themeColor)
+        return (
+            <TouchableOpacity onPress={() => this.onClick(name)}>
+                <View style={styles.item_container}>
+                    <View style={{alignItems: 'center', flexDirection: 'row'}}>
+                        {Icons && icon ?
+                            <Icons name={icon} size={16} style={{color: theme.themeColor, marginRight: 10}}/> :
+                            <View style={{opacity: 1, width: 16, height: 16, marginRight: 10}}></View>
+                        }
+                        <Text style={{fontSize: 16}}>{name+' '}</Text>
+                        <Text style={{fontSize: 16,color:theme.themeColor}}>{count}</Text>
+                    </View>
+                    <Ionicons
+                        name='ios-arrow-forward'
+                        size={16}
+                        style={{color: theme.themeColor || 'black'}}
+                    />
+                </View>
+            </TouchableOpacity>
+        )
     }
 
     render() {
-        const {theme} = this.props;
-
+        const {theme, user} = this.props;
+        let avatar_url = '';
+        let public_repos = '';
+        let followers = '';
+        let following = '';
+        let name = '';
+        if (user) {
+            avatar_url = user.avatar_url ?? '';
+            public_repos = (user.public_repos ?? '')
+            followers =  (user.followers ?? '')
+            following =  (user.following ?? '')
+            name = user.login ?? ''
+        }
         let statusBar = {
             backgroundColor: theme.themeColor,
             barStyle: 'light-content',
         }
         let navigationBar = <NavigationBar title={Ii8n('tabMy')} style={theme.styles.navBar} statusBar={statusBar}
-                                           rightBtn={this._getRightBtn()}/>
+                                           leftBtn={this._getSearchBtn()} rightBtn={this._getSettingBtn()}/>
+
         return (
             <View style={styles.container}>
                 {navigationBar}
@@ -96,18 +145,20 @@ class MyPage extends Component<Props> {
                                     alignItems: 'center',
                                     justifyContent: 'space-between'
                                 }}>
-                                    <Ionicons name={More_Menu.About.icon} size={40}
-                                              style={{marginRight: 10, color: theme.themeColor}}/>
-                                    <Text>ZDQ</Text>
+                                    <Image style={{width: 80, height: 80, marginRight: 10, borderRadius: 40}}
+                                           source={{uri: avatar_url}}/>
+                                    <Text style={{fontSize: 20}}>{name}</Text>
                                 </View>
                                 <Ionicons name={'ios-arrow-forward'} size={16}
                                           style={{marginRight: 10, color: theme.themeColor}}/>
                             </View>
                         </TouchableOpacity>
-                        <Text style={styles.groupTitle}>{Ii8n('setting')}</Text>
-                        {this.getItem(this.state.menus.Custom_Language)}
+                        <Text style={styles.groupTitle}></Text>
+                        {this.getItem(this.public_repos, public_repos, Octicons, 'repo')}
                         {ViewUtil.getLine()}
-                        {this.getItem(this.state.menus.Custom_Theme)}
+                        {this.getItem(this.followers,followers, Octicons, 'repo')}
+                        {ViewUtil.getLine()}
+                        {this.getItem(this.following,following, Octicons, 'repo')}
                     </View>
                 </ScrollView>
             </View>
@@ -117,9 +168,14 @@ class MyPage extends Component<Props> {
 
 const mapStateToProps = state => ({
     theme: state.theme.theme,
+    user: state.user.user
 })
 
-export default connect(mapStateToProps,)(MyPage);
+const mapDispatchToProps = dispatch => ({
+    getUserInfo: () => dispatch(actions.getUserInfo())
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(MyPage);
 
 const styles = StyleSheet.create({
     container: {
@@ -132,7 +188,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         backgroundColor: 'white',
         padding: 10,
-        height: 90,
+        height: 150,
     },
     groupTitle: {
         marginLeft: 10,
@@ -140,5 +196,13 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         fontSize: 12,
         color: 'gray'
+    },
+    item_container: {
+        backgroundColor: 'white',
+        padding: 10,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
     }
 });

@@ -1,6 +1,6 @@
 import Types from '../types'
-import DataStore, {FLAG_STORAGE} from '../../expand/dao/DataStore'
-import  {_projectModels} from '../popular/index'
+import DataStore, {FLAG_STORAGE} from '../../../expand/dao/DataStore'
+import  {_projectModels} from '../popular'
 
 export function  onLoadTrendingData(storeName,url,pageSize,favoriteDao) {
 

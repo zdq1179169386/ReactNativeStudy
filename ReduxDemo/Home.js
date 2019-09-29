@@ -30,7 +30,6 @@ const  mapStatetoProps = (state) => ({
 //将action 塞进 props 里
 const actionCreators = {add,cut,asyncAdd}
 
-
 export default connect(mapStatetoProps,actionCreators)(Home)
 
 const styles = StyleSheet.create({

@@ -9,10 +9,10 @@ import {
 } from 'react-native';
 
 import {applyMiddleware, createStore} from "redux";
-import {counter} from "./reducer";
 import Home from './Home'
 import {Provider} from 'react-redux'
 import thunk from 'redux-thunk';
+import {counter} from './reducer'
 
 //中间件，加入异步组件
 const middlewares = [
